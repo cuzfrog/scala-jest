@@ -1,0 +1,5 @@
+package sjest
+
+class JsTestConverterTest {
+
+}
