@@ -16,16 +16,16 @@ private class JestTask(override val taskDef: TaskDef,
                        loggers: Array[Logger]): Array[Task] = {
     implicit val _taskDef: TaskDef = taskDef
 
-    loggers.foreach(_.info(s"testing against: ${taskDef.fullyQualifiedName}"))
+    loggers.foreach(_.info(s"Testing against: ${taskDef.fullyQualifiedName}"))
     val suite =
       TestUtils.loadModule(taskDef.fullyQualifiedName, testClassLoader).asInstanceOf[JestSuite]
 
     val jsTestCase = suite.getTestCase(taskDef)
-    JsTestConverter.generateJsTests(jsTestCase)
+    val jsTestPath = JsTestConverter.generateJsTest(jsTestCase)
 
     val startTime = Deadline.now
     val event = try {
-      ChildProcess.execSync(s"npm test -- ${jsTestCase.getPath}") //run code with nodejs
+      ChildProcess.execSync(s"npm test -- $jsTestPath") //run code with nodejs
       JestTestEvent(Status.Success)
     } catch {
       case NonFatal(t) =>

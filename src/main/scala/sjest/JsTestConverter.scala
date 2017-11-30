@@ -3,7 +3,14 @@ package sjest
 import nodejs.{FSUtils, Path}
 
 private object JsTestConverter {
-  def generateJsTests(jsTestCase: JsTestCase)(implicit config: TestFrameworkConfig): Unit = {
+  /**
+   * Generate *.test.js file.
+   *
+   * @return the generated file path.
+   */
+  def generateJsTest(jsTestCase: JsTestCase)
+                    (implicit config: TestFrameworkConfig): String = {
+
     val module =
       s"""const out = require('${this.resolveOptJsPath}');
          |const loadTest = out.loadTest
@@ -19,10 +26,14 @@ private object JsTestConverter {
     val NEWLINE = System.lineSeparator()
     val content = module + NEWLINE + contents.mkString
 
-    FSUtils.write(this.resolveTestJsPath(jsTestCase), content)
+    val testJsPath = this.resolveTestJsPath(jsTestCase)
+    FSUtils.write(testJsPath, content)
+    testJsPath
   }
 
-  private def resolveOptJsPath(implicit config: TestFrameworkConfig): String = ???
+  private def resolveOptJsPath(implicit config: TestFrameworkConfig): String = {
+    Path.relative(config.testJsDir, config.optJsPath)
+  }
 
   private def resolveTestJsPath(jsTestCase: JsTestCase)
                                (implicit config: TestFrameworkConfig): String = {

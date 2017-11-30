@@ -25,6 +25,7 @@ private object FileSystem extends js.Object {
 private[sjest] object Path extends js.Object {
   def dirname(file: String): String = js.native
   def resolve(path: String*): String = js.native
+  def relative(from: String, to: String): String = js.native
 }
 
 private[sjest] object FSUtils {
