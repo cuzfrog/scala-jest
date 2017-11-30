@@ -48,3 +48,6 @@ project/target
 #SHITTY output not in target directory
 build.log
 /bin/
+
+#js
+node_modules/

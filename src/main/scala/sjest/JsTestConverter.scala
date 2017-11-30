@@ -5,7 +5,7 @@ import nodejs.FSUtils
 private object JsTestConverter {
   def generateJsTests(jsTestCase: JsTestCase): Unit = {
     val module =
-      s"""const out = require('../../js-tests/target/scala-2.12/js-tests-test-fastopt.js');
+      s"""const out = require('../scala-2.12/simple-jest-test-fastopt.js');
          |const loadTest = out.loadTest
          |
       """.stripMargin

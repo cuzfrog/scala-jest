@@ -1,0 +1,22 @@
+{
+  "name": "simple-jest",
+  "version": "0.0.1",
+  "description": "A scala.js test framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cuzfrog/simple-jest.git"
+  },
+  "author": "Cause Chung",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/cuzfrog/simple-jest/issues"
+  },
+  "homepage": "https://github.com/cuzfrog/simple-jest#readme",
+  "devDependencies": {
+    "jest": "^21.2.1"
+  }
+}

@@ -13,5 +13,15 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion
     ),
-    testFrameworks += new TestFramework("sjest.JestFramework")
+    testFrameworks += new TestFramework("sjest.JestFramework"),
+    scalaJSModuleKind := ModuleKind.CommonJSModule,
+    tmpfsDirectoryMode := TmpfsDirectoryMode.Mount
   )
+
+//mount tmpfs:
+onLoad in Global := {
+  val insertCommand: State => State =
+    (state: State) =>
+      state.copy(remainingCommands = ";tmpfsOn" +: state.remainingCommands)
+  (onLoad in Global).value andThen insertCommand
+}

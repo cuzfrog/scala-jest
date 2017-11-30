@@ -5,11 +5,6 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
 
-trait JestSuite extends BaseSuite
-trait JestSuiteOnly extends BaseSuite
-trait JestSuiteSkip extends BaseSuite
-
-
 private trait BaseSuite {
   def test(name: String)(block:  => Unit): Unit =
     JestGlobal.test(name,() => block)
