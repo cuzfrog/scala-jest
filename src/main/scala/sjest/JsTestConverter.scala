@@ -13,18 +13,16 @@ private object JsTestConverter {
 
     val module =
       s"""const out = require('${this.resolveOptJsPath}');
-         |const loadTest = out.loadTest
-         |
-      """.stripMargin
+         |const loadTest = out.loadTest""".stripMargin
     val contents = jsTestCase.getTests.map { case (description, _) =>
       s"""test('$description', () => {
          |  loadTest('${jsTestCase.getName}','$description')();
-         |});
-         |
-      """.stripMargin
+         |});""".stripMargin
     }
-    val NEWLINE = System.lineSeparator()
-    val content = module + NEWLINE + contents.mkString
+
+
+
+    val content = module + NEWLINE(2) + contents.mkString(NEWLINE)
 
     val testJsPath = this.resolveTestJsPath(jsTestCase)
     FSUtils.write(testJsPath, content)
@@ -40,5 +38,7 @@ private object JsTestConverter {
                                (implicit config: TestFrameworkConfig): String = {
     Path.resolve(config.testJsDir, jsTestCase.getFilename)
   }
+
+  private def NEWLINE(implicit n: Int = 1) = System.lineSeparator() * n
 }
 

@@ -6,7 +6,7 @@ import scala.scalajs.js.|
 
 @js.native
 @JSImport("fs", JSImport.Namespace)
-private object FileSystem extends js.Object {
+private[sjest] object FileSystem extends js.Object {
   def openSync(file: String, flags: String | Int,
                mode: js.UndefOr[Int] = js.undefined): Int = js.native
 
@@ -16,8 +16,10 @@ private object FileSystem extends js.Object {
 
   def mkdirSync(file: String): Unit = js.native
 
-  def writeFileSync(file: String | Int, data: String,
+  def writeFileSync(path: String | Int, data: String,
                     options: js.UndefOr[js.Object] = js.undefined): Unit = js.native
+
+  def readFileSync(path: String, options: js.UndefOr[js.Object | String] = js.undefined): js.Object = js.native
 }
 
 @js.native

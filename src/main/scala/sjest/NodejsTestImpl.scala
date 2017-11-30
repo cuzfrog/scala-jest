@@ -11,11 +11,12 @@ private object NodejsTestImpl {
   def runTest(jsTestPath: String, loggers: Array[Logger])
              (implicit taskDef: TaskDef, config: TestFrameworkConfig): Event = {
     val startTime = Deadline.now
+    loggers.foreach(_.info(s"---jest--- Testing against: ${taskDef.fullyQualifiedName}"))
     val event = try {
-      loggers.foreach(_.info(s"---jest--- Testing against: ${taskDef.fullyQualifiedName}"))
-      val JestFramework.NodejsCmd(cmd, args) = config.npmCmdOfPath(jsTestPath)
+
+      val JestFramework.NodejsCmd(cmd, args) = config.nodejsCmdOfPath(jsTestPath)
       val childProcess = ChildProcess.spawnSync(cmd, args) //run code with nodejs
-      //loggers.foreach(_.info(childProcess.toString))
+
       childProcess.status match {
         case 0 =>
           val output = Option(childProcess.output)
