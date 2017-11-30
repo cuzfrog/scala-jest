@@ -45,11 +45,19 @@ private class JestTask(override val taskDef: TaskDef,
     val startTime = Deadline.now
     val event = try {
       loggers.foreach(_.info(s"---jest--- Testing against: ${taskDef.fullyQualifiedName}"))
-      val childProcess = ChildProcess.spawnSync(config.npmCmdOfPath(jsTestPath)) //run code with nodejs
-      val output = Option(childProcess.output)
-      output.foreach(out => loggers.foreach(_.info(out.toString)))
-      loggers.foreach(_.info(s"PASS ${taskDef.fullyQualifiedName}"))
-      JestTestEvent(Status.Success)
+      val JestFramework.NodejsCmd(cmd, args) = config.npmCmdOfPath(jsTestPath)
+      val childProcess = ChildProcess.spawnSync(cmd, args) //run code with nodejs
+      //loggers.foreach(_.info(childProcess.toString))
+      childProcess.status match {
+        case 0 =>
+          val output = Option(childProcess.output)
+          output.foreach(out => loggers.foreach(_.info(out.toString)))
+          loggers.foreach(_.info(s"PASS ${taskDef.fullyQualifiedName}"))
+          JestTestEvent(Status.Success)
+        case _ =>
+          loggers.foreach(_.error(s"test failed: "))
+          JestTestEvent(Status.Failure)
+      }
     } catch {
       case NonFatal(t) =>
         loggers.foreach(_.error(s"test failed with $t}"))

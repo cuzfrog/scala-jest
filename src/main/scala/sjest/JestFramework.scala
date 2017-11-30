@@ -1,6 +1,7 @@
 package sjest
 
 import sbt.testing.{Fingerprint, Runner}
+import sjest.JestFramework.NodejsCmd
 
 abstract class JestFramework extends sbt.testing.Framework {
   override final def name(): String = "simple-jest"
@@ -24,7 +25,7 @@ abstract class JestFramework extends sbt.testing.Framework {
     TestFrameworkConfig(
       this.optJsPath,
       this.testJsDir,
-      this.npmCmd,
+      this.nodejsCmd,
       this.autoRunTestInSbt)
   }
 
@@ -36,10 +37,15 @@ abstract class JestFramework extends sbt.testing.Framework {
   /** Yield npm test command, given a test.js file path.<br>
    * /dev/null is used to suppress jest output in sbt console.
    */
-  protected def npmCmd(jsTestPath: String): String = s"npm test -- $jsTestPath &> /dev/null &"
+  protected def nodejsCmd(jsTestPath: String): NodejsCmd =
+    NodejsCmd("npm", Array("test", "--", jsTestPath, "--colors"))
   /** Whether to run npm test in sbt. <br>
    * 'npm test -- xx.test.js' is executed for every test, thus worse performance.
    * One could disable it by set this to false, and manually run jest from command line.
    */
   protected def autoRunTestInSbt: Boolean = true
+}
+
+object JestFramework{
+  final case class NodejsCmd(cmd: String, args: Array[String])
 }
