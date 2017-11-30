@@ -7,5 +7,8 @@ import scala.scalajs.js.|
 @js.native
 @JSImport("child_process", JSImport.Namespace)
 private[sjest] object ChildProcess extends js.Object {
-  def execSync(command: String, options: js.UndefOr[js.Object] = js.undefined): js.Object | String = js.native
+  def execSync(command: String,
+               options: js.UndefOr[js.Object] = js.undefined): js.Object | String = js.native
+  def spawnSync(command: String, args: Array[String] = Array(),
+                options: js.UndefOr[js.Object] = js.undefined): js.Object = js.native
 }

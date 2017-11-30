@@ -21,7 +21,11 @@ abstract class JestFramework extends sbt.testing.Framework {
   }
 
   private implicit final def assembleConfig: TestFrameworkConfig = {
-    TestFrameworkConfig(this.optJsPath, this.testJsDir)
+    TestFrameworkConfig(
+      this.optJsPath,
+      this.testJsDir,
+      this.npmCmd,
+      this.autoRunTestInSbt)
   }
 
   //client api:
@@ -29,4 +33,13 @@ abstract class JestFramework extends sbt.testing.Framework {
   protected def optJsPath: String
   /** Generated *.test.js full path or path relative to sbt root dir. */
   protected def testJsDir: String = "./target/simple-jests/"
+  /** Yield npm test command, given a test.js file path.<br>
+   * /dev/null is used to suppress jest output in sbt console.
+   */
+  protected def npmCmd(jsTestPath: String): String = s"npm test -- $jsTestPath &> /dev/null &"
+  /** Whether to run npm test in sbt. <br>
+   * 'npm test -- xx.test.js' is executed for every test, thus worse performance.
+   * One could disable it by set this to false, and manually run jest from command line.
+   */
+  protected def autoRunTestInSbt: Boolean = true
 }
