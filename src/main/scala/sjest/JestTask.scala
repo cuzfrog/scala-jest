@@ -8,7 +8,8 @@ import scala.concurrent.duration.Deadline
 import scala.util.control.NonFatal
 
 private class JestTask(override val taskDef: TaskDef,
-                     testClassLoader: ClassLoader) extends sbt.testing.Task {
+                       testClassLoader: ClassLoader)
+                      (implicit config: TestFrameworkConfig) extends sbt.testing.Task {
   override def tags(): Array[String] = Array("my-test-task")
 
   override def execute(eventHandler: EventHandler,

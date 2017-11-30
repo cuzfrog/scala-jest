@@ -22,11 +22,15 @@ private object FileSystem extends js.Object {
 
 @js.native
 @JSImport("path", JSImport.Namespace)
-private object Path extends js.Object {
+private[sjest] object Path extends js.Object {
   def dirname(file: String): String = js.native
+  def resolve(path: String*): String = js.native
 }
 
-object FSUtils {
+private[sjest] object FSUtils {
+  /** *
+   * Write content to file, create dirs and file if they do not exist yet.
+   */
   def write(file: String, content: String): Unit = {
     ensureDirectoryExistence(file)
     FileSystem.writeFileSync(file, content)

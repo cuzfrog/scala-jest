@@ -1,8 +1,6 @@
 package sjest
 
-import sbt.testing._
-
-import scala.scalajs.js.annotation._
+import sbt.testing.TaskDef
 import scala.scalajs.reflect.annotation.EnableReflectiveInstantiation
 
 @EnableReflectiveInstantiation

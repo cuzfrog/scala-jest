@@ -14,11 +14,6 @@ private final class JsTestCase {
     tests += (description -> testBlock)
   }
 
-  def getPath: String = {
-    require(name != null)
-    s"target/my-tests/$name.test.js"
-  }
-
   def getTests: Map[String, js.Function] = tests.toMap
 
   def setName(name: String): this.type = {
@@ -28,7 +23,15 @@ private final class JsTestCase {
   }
 
   def getName: String = {
-    require(name != null)
+    checkNameState()
     this.name
   }
+
+  def getFilename: String = {
+    checkNameState()
+    s"$name.test.js"
+  }
+
+  private def checkNameState(): Unit =
+    if (name == null) throw new IllegalStateException("Name not set.")
 }

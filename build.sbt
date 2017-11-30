@@ -13,7 +13,7 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion
     ),
-    testFrameworks += new TestFramework("sjest.JestFramework"),
+    testFrameworks += new TestFramework("anywhere.MyTestFramework"),
     scalaJSModuleKind := ModuleKind.CommonJSModule,
     tmpfsDirectoryMode := TmpfsDirectoryMode.Mount
   )

@@ -2,7 +2,7 @@ package sjest
 
 import sbt.testing.{Fingerprint, Runner}
 
-class JestFramework extends sbt.testing.Framework {
+abstract class JestFramework extends sbt.testing.Framework {
   override final def name(): String = "simple-jest"
 
   override final def fingerprints(): Array[Fingerprint] = Array(new JestFingerprint)
@@ -17,6 +17,14 @@ class JestFramework extends sbt.testing.Framework {
                                  remoteArgs: Array[String],
                                  testClassLoader: ClassLoader,
                                  send: String => Unit): Runner = {
-    this.runner(args, remoteArgs, testClassLoader)
+    new JestRunner(args, remoteArgs, testClassLoader)
   }
+
+  private implicit final def assembleConfig: TestFrameworkConfig = {
+    TestFrameworkConfig(this.optJsPath, this.testJsDir)
+  }
+
+  //client provides:
+  protected def optJsPath: String
+  protected def testJsDir: String = "./target/simple-jests/"
 }

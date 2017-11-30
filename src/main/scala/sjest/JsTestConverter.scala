@@ -1,11 +1,11 @@
 package sjest
 
-import nodejs.FSUtils
+import nodejs.{FSUtils, Path}
 
 private object JsTestConverter {
-  def generateJsTests(jsTestCase: JsTestCase): Unit = {
+  def generateJsTests(jsTestCase: JsTestCase)(implicit config: TestFrameworkConfig): Unit = {
     val module =
-      s"""const out = require('../scala-2.12/simple-jest-test-fastopt.js');
+      s"""const out = require('${this.resolveOptJsPath}');
          |const loadTest = out.loadTest
          |
       """.stripMargin
@@ -19,7 +19,14 @@ private object JsTestConverter {
     val NEWLINE = System.lineSeparator()
     val content = module + NEWLINE + contents.mkString
 
-    FSUtils.write(jsTestCase.getPath, content)
+    FSUtils.write(this.resolveTestJsPath(jsTestCase), content)
+  }
+
+  private def resolveOptJsPath(implicit config: TestFrameworkConfig): String = ???
+
+  private def resolveTestJsPath(jsTestCase: JsTestCase)
+                               (implicit config: TestFrameworkConfig): String = {
+    Path.resolve(config.testJsDir, jsTestCase.getFilename)
   }
 }
 

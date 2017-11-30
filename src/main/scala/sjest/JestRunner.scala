@@ -3,8 +3,9 @@ package sjest
 import sbt.testing.{Task, TaskDef}
 
 private class JestRunner(override val args: Array[String],
-                       override val remoteArgs: Array[String],
-                       val testClassLoader: ClassLoader) extends sbt.testing.Runner {
+                         override val remoteArgs: Array[String],
+                         testClassLoader: ClassLoader)
+                        (implicit config: TestFrameworkConfig) extends sbt.testing.Runner {
 
   private var isDone: Boolean = false
 
