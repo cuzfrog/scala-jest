@@ -11,7 +11,7 @@ private class JestRunner(override val args: Array[String],
     taskDefs.map(new JestTask(_, testClassLoader))
 
   override def done(): String = {
-    "my-test completed."
+    "test completed."
   }
 
   override def receiveMessage(msg: String): Option[String] = {
