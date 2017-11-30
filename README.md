@@ -11,6 +11,8 @@ generates `*.test.js` files to call them, and uses nodejs' `child_process` to ex
 `npm test`, which then trigger `jest`. So scala.js is not involved in the testing process,
 only the stdout/err from npm shown in sbt console.
 
+A drawback is that file paths are not managed by sbt, and must be set manually.
+
 ### Setup
 
 Prerequisite:

@@ -24,7 +24,9 @@ abstract class JestFramework extends sbt.testing.Framework {
     TestFrameworkConfig(this.optJsPath, this.testJsDir)
   }
 
-  //client provides:
+  //client api:
+  /** *opt.js full path or path relative to sbt root dir. */
   protected def optJsPath: String
+  /** Generated *.test.js full path or path relative to sbt root dir. */
   protected def testJsDir: String = "./target/simple-jests/"
 }

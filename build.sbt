@@ -1,27 +1,38 @@
 import Settings._
 
-shellPrompt in ThisBuild := { state => Project.extract(state).currentRef.project + "> " }
-scalaVersion in ThisBuild := "2.12.3"
-crossScalaVersions in ThisBuild := Seq("2.11.11", "2.12.3")
+inThisBuild(Seq(
+  shellPrompt := { state => Project.extract(state).currentRef.project + "> " },
+  scalaVersion := "2.12.3",
+  crossScalaVersions := Seq("2.11.11", "2.12.3"),
+  version := "0.0.1-SNAPSHOT"
+))
 
-lazy val root = (project in file("."))
+val root = (project in file("."))
   .enablePlugins(ScalaJSPlugin)
   .settings(commonSettings, publicationSettings, readmeVersionSettings)
   .settings(
     name := "simple-jest",
-    version := "0.0.1-SNAPSHOT",
     libraryDependencies ++= Seq(
-      "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion
+      "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion,
+      "com.lihaoyi" %%% "utest" % "0.6.0" % Test
     ),
-    testFrameworks += new TestFramework("anywhere.MyTestFramework"),
-    scalaJSModuleKind := ModuleKind.CommonJSModule,
-    tmpfsDirectoryMode := TmpfsDirectoryMode.Mount
+    testFrameworks += new TestFramework("utest.runner.Framework")
+  )
+
+val tests = project.dependsOn(root)
+  .enablePlugins(ScalaJSPlugin)
+  .settings(commonSettings)
+  .settings(
+    name := "simple-jest-tests",
+    libraryDependencies ++= Seq(
+    ),
+    testFrameworks += new TestFramework("anywhere.MyTestFramework")
   )
 
 //mount tmpfs:
 onLoad in Global := {
   val insertCommand: State => State =
     (state: State) =>
-      state.copy(remainingCommands = ";tmpfsOn" +: state.remainingCommands)
+      state.copy(remainingCommands = ";root/tmpfsOn;tests/tmpfsOn" +: state.remainingCommands)
   (onLoad in Global).value andThen insertCommand
 }

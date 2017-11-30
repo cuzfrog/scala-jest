@@ -32,6 +32,7 @@ private object JsTestConverter {
   }
 
   private def resolveOptJsPath(implicit config: TestFrameworkConfig): String = {
+    //todo: check if optJs is stale
     Path.relative(config.testJsDir, config.optJsPath)
   }
 

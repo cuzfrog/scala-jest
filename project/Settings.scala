@@ -1,6 +1,8 @@
 import sbt.Keys._
 import sbt._
 import MyTasks._
+import com.github.cuzfrog.sbttmpfs.SbtTmpfsPlugin.autoImport._
+import org.scalajs.sbtplugin.ScalaJSPlugin.AutoImport._
 
 object Settings {
   val commonSettings = Seq(
@@ -17,7 +19,9 @@ object Settings {
     ),
     logBuffered in Test := false,
     parallelExecution in Test := false,
-    licenses += ("Apache-2.0", url("https://opensource.org/licenses/Apache-2.0"))
+    licenses += ("Apache-2.0", url("https://opensource.org/licenses/Apache-2.0")),
+    tmpfsDirectoryMode := TmpfsDirectoryMode.Mount,
+    scalaJSModuleKind := ModuleKind.CommonJSModule
   )
 
   val publicationSettings = Seq(
