@@ -1,6 +1,6 @@
 package anywhere
 
-object Test1 extends sjest.JestSuite {
+class Test1 extends sjest.JestSuite {
   test("this is my first test") {
     println("do some test1!")
     expect(1 + 2).toBe(3)

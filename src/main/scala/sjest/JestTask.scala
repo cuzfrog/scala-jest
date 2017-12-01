@@ -12,8 +12,8 @@ private class JestTask(override val taskDef: TaskDef,
                        loggers: Array[Logger]): Array[Task] = {
     implicit val _taskDef: TaskDef = taskDef
 
-    val suite =
-      TestUtils.loadModule(taskDef.fullyQualifiedName, testClassLoader).asInstanceOf[JestSuite]
+    val suite = TestUtils.newInstance(taskDef.fullyQualifiedName(),
+      testClassLoader, Seq.empty)(Seq.empty).asInstanceOf[JestSuite]
 
     val jsTestCase = suite.getTestCase(taskDef)
     val jsTestPath = JsTestConverter.generateJsTest(jsTestCase)
