@@ -1,12 +1,13 @@
 package sjest
 
 import scala.collection.mutable
+import scala.collection.immutable
 import scala.scalajs.js
 
 private final class JsTestCase {
 
   private var name: String = _
-  private val tests: mutable.Map[String, js.Function] = mutable.Map.empty
+  private val tests: mutable.Map[String, js.Function] = mutable.SortedMap.empty
 
   def add[T](description: String, testBlock: () => T): Unit = {
     if (tests.get(description).isDefined)
@@ -14,7 +15,7 @@ private final class JsTestCase {
     tests += (description -> testBlock)
   }
 
-  def getTests: Map[String, js.Function] = tests.toMap
+  def getTests: Map[String, js.Function] = immutable.SortedMap(tests.toSeq.reverse: _*)
 
   def setName(name: String): this.type = {
     require(name.matches("""[\w-_\.]*\$?"""), s"Bad module name: $name")
