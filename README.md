@@ -28,3 +28,7 @@ Dependency:
     libraryDependencies += "com.github.cuzfrog" %%% "simple-jest" % "0.0.1-SNAPSHOT" Test
     
 ### How to use:
+
+### Misc
+
+This project depends on [Nodejs binding](https://github.com/scalajs-io/nodejs).

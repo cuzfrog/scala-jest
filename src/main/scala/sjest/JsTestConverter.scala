@@ -1,6 +1,7 @@
 package sjest
 
-import nodejs.{FSUtils, Path}
+import io.scalajs.nodejs.path.Path
+import sjest.nodejs.FSUtils
 
 private object JsTestConverter {
   /**

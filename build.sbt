@@ -14,6 +14,7 @@ val root = (project in file("."))
     name := "simple-jest",
     libraryDependencies ++= Seq(
       "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion,
+      "io.scalajs" %%% "nodejs" % "0.4.2",
       "com.lihaoyi" %%% "utest" % "0.6.0" % Test
     ),
     testFrameworks += new TestFramework("utest.runner.Framework")

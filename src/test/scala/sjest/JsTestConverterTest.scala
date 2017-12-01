@@ -1,6 +1,7 @@
 package sjest
 
-import sjest.nodejs.FileSystem
+import io.scalajs.nodejs.fs.Fs
+import sjest.nodejs.FSUtils
 import utest._
 
 import scala.util.Random
@@ -23,14 +24,18 @@ object JsTestConverterTest extends TestSuite {
       autoRunTestInSbt = true
     )
 
+  override def utestAfterAll(): Unit = { //tear down
+    FSUtils.delete(mockConfig.testJsDir)
+  }
+
   val tests = Tests {
     "test.js-generation" - {
       val path = JsTestConverter.generateJsTest(mockTestCase)
       val expectedPath = mockConfig.testJsDir + mockTestCase.getFilename
       assert(path == expectedPath)
-      assert(FileSystem.existsSync(path))
+      assert(Fs.existsSync(path))
 
-      val content = FileSystem.readFileSync(path).toString
+      val content = Fs.readFileSync(path).toString()
       val expectedContent =
         s"""const out = require('../dir1/fastopt.js');
            |const loadTest = out.loadTest
