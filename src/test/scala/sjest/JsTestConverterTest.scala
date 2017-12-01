@@ -12,7 +12,7 @@ object JsTestConverterTest extends TestSuite {
     val jsTestCase = new JsTestCase
     jsTestCase.add("I am test1", () => ())
     jsTestCase.add("I am test2", () => println("make some noise"))
-    val randomName = Random.alphanumeric.take(5).mkString
+    val randomName = Random.genAlphanumeric(5)
     jsTestCase.setName(randomName)
   }
 
