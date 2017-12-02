@@ -51,7 +51,7 @@ abstract class JestFramework extends sbt.testing.Framework {
 
 object JestFramework {
   final case class NodejsCmd(cmd: String, args: js.Array[String]) {
-    require(Fs.existsSync(cmd), s"Cannot find '$cmd', please use absolute path.")
+    require(Fs.existsSync(cmd), s"Cannot find '$cmd', please use path.")
   }
 }
 

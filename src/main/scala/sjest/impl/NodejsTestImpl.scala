@@ -1,15 +1,13 @@
 package sjest.impl
 
-import io.scalajs.nodejs.fs.Fs
 import sbt.testing.{Event, Logger, Status, TaskDef}
-import sjest.nodejs.{ChildProcess, ChildProcessOpt}
+import sjest.nodejs.{ChildProcess, ChildProcessOpt, FSUtils}
 import sjest.support.VisiableForTest
-import sjest.{JestFramework, TestFrameworkConfig}
+import sjest.{JestFramework, LoggersOps, TestFrameworkConfig}
 
 import scala.concurrent.duration.Deadline
 import scala.util.control.NonFatal
-
-import sjest.LoggersOps
+import sjest.NEWLINE
 
 private class NodejsTestImpl extends NodejsTest {
 
@@ -38,13 +36,16 @@ private class NodejsTestImpl extends NodejsTest {
     childProcess.status match {
       case 0 =>
         val output = childProcess.outputOpt.map(parseJestOutput)
-        output.foreach(out => loggers.info(out))
+        output.foreach { out =>
+          loggers.info(out)
+          FSUtils.write("/tmp/test-log", out)
+        }
         JestTestEvent(Status.Success)
       case _ =>
         childProcess.stderrOpt.foreach(loggers.error)
 
-//        loggers.error(s"test failed with error: ${childProcess.error}")
-//        loggers.foreach(_.error(s"${childProcess.stderr.toString}"))
+        //        loggers.error(s"test failed with error: ${childProcess.error}")
+        //        loggers.foreach(_.error(s"${childProcess.stderr.toString}"))
 
         JestTestEvent(Status.Failure)
     }
@@ -52,6 +53,14 @@ private class NodejsTestImpl extends NodejsTest {
 
   @VisiableForTest
   private[sjest] def parseJestOutput(in: String): String = {
-    in
+    val ansiRegex = """[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]"""
+    val lines = in.replaceAll(ansiRegex, "").split(raw"""$NEWLINE""")
+    val filtered = lines.filter { line =>
+      line.trim.nonEmpty &&
+        !line.startsWith(",[BABEL] Note: The code generator has deoptimised the styling of") &&
+        !line.startsWith("Ran all test suites matching") &&
+        !line.startsWith("Test Suites: 1 passed, 1 total")
+    }
+    filtered.mkString(NEWLINE)
   }
 }

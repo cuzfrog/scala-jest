@@ -12,7 +12,7 @@ import scala.util.Random
 
 object NodejsTestImplTest extends TestSuite {
 
-  private val nodejsTestImpl = NodejsTest()
+  private val impl:NodejsTestImpl = NodejsTest().asInstanceOf[NodejsTestImpl]
 
   private implicit val mockConfig: TestFrameworkConfig = MockObjects.mockConfig.copy(
     nodejsCmdOfPath = (jsTestPath: String) => NodejsCmd("/usr/bin/npm", js.Array("test", "--", jsTestPath))
@@ -31,13 +31,16 @@ object NodejsTestImplTest extends TestSuite {
   val tests = Tests {
     "successful-test" - {
       val mockJsTestFile = new MockJsTestFile
-      val event = nodejsTestImpl.runTest(mockJsTestFile.testPath, Array.empty)
+      val event = impl.runTest(mockJsTestFile.testPath, Array.empty)
       assert(event.status() == Status.Success)
     }
     "failed-test" - {
       val mockJsTestFile = new MockJsTestFileFailed
-      val event = nodejsTestImpl.runTest(mockJsTestFile.testPath, Array.empty)
+      val event = impl.runTest(mockJsTestFile.testPath, Array.empty)
       assert(event.status() == Status.Failure)
+    }
+    "parseJestOutput" - {
+      //val out = impl.parseJestOutput()
     }
   }
 }
