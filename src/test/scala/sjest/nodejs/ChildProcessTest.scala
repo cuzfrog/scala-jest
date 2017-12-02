@@ -10,7 +10,7 @@ object ChildProcessTest extends TestSuite {
   val tests = Tests {
     "spawnSync-basic" - {
       val childProcess = ChildProcess.spawnSync("echo", js.Array("value"))
-      val output = childProcess.stdout.toString
+      val output = childProcess.stdoutOpt.get
       assert(output == "value" + NEWLINE)
     }
   }

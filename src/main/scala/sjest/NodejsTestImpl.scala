@@ -1,7 +1,9 @@
 package sjest
 
+import io.scalajs.nodejs.fs.Fs
 import sbt.testing.{Event, Logger, Status, TaskDef}
-import sjest.nodejs.ChildProcess
+import sjest.nodejs.{ChildProcess, ChildProcessOpt}
+import sjest.support.VisiableForTest
 
 import scala.concurrent.duration.Deadline
 import scala.util.control.NonFatal
@@ -11,27 +13,17 @@ private object NodejsTestImpl {
   def runTest(jsTestPath: String, loggers: Array[Logger])
              (implicit taskDef: TaskDef, config: TestFrameworkConfig): Event = {
     val startTime = Deadline.now
-    loggers.foreach(_.info(s"---jest--- Testing against: ${taskDef.fullyQualifiedName}"))
+    loggers.info(s"---jest--- Testing against: ${taskDef.fullyQualifiedName}")
     val event = try {
 
       val JestFramework.NodejsCmd(cmd, args) = config.nodejsCmdOfPath(jsTestPath)
+      if (!Fs.existsSync(cmd)) throw new IllegalArgumentException(s"Cannot find $cmd. Have you installed it?")
       val childProcess = ChildProcess.spawnSync(cmd, args) //run code with nodejs
 
-      childProcess.status match {
-        case 0 =>
-          val output = Option(childProcess.output)
-          output.foreach(out => loggers.foreach(_.info(out.toString)))
-          loggers.foreach(_.info(s"PASS ${taskDef.fullyQualifiedName}"))
-          JestTestEvent(Status.Success)
-        case _ =>
-          loggers.foreach(_.error(s"test failed with error: ${childProcess.error}"))
-          loggers.foreach(_.error(s"${childProcess.stderr.toString}"))
-          loggers.foreach(_.error(s"${childProcess.stdout.toString}"))
-          JestTestEvent(Status.Failure)
-      }
+      this.resolveChildProcess(childProcess, loggers)
     } catch {
       case NonFatal(t) =>
-        loggers.foreach(_.error(s"test failed with $t}"))
+        loggers.error(s"Test failed with $t}")
         JestTestEvent(Status.Failure)
     }
 
@@ -39,4 +31,25 @@ private object NodejsTestImpl {
     event.copy(duration = duration)
   }
 
+  private def resolveChildProcess(childProcess: ChildProcessOpt, loggers: Array[Logger])
+                                 (implicit taskDef: TaskDef): JestTestEvent = {
+    childProcess.status match {
+      case 0 =>
+        val output = childProcess.outputOpt.map(parseJestOutput)
+        output.foreach(out => loggers.info(out))
+        JestTestEvent(Status.Success)
+      case _ =>
+        childProcess.stderrOpt.foreach(loggers.error)
+
+//        loggers.error(s"test failed with error: ${childProcess.error}")
+//        loggers.foreach(_.error(s"${childProcess.stderr.toString}"))
+
+        JestTestEvent(Status.Failure)
+    }
+  }
+
+  @VisiableForTest
+  private[sjest] def parseJestOutput(in: String): String = {
+    in
+  }
 }

@@ -40,7 +40,7 @@ abstract class JestFramework extends sbt.testing.Framework {
    * /dev/null is used to suppress jest output in sbt console.
    */
   protected def nodejsCmd(jsTestPath: String): NodejsCmd =
-    NodejsCmd("npm", js.Array("test", "--", jsTestPath, "--colors"))
+    NodejsCmd("node_modules/jest/bin/jest.js", js.Array("--colors", jsTestPath))
   /** Whether to run npm test in sbt. <br>
    * 'npm test -- xx.test.js' is executed for every test, thus worse performance.
    * One could disable it by set this to false, and manually run jest from command line.
