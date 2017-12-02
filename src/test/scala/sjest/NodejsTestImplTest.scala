@@ -28,7 +28,7 @@ object NodejsTestImplTest extends TestSuite {
   val tests = Tests {
     "successful-test" - {
       val mockJsTestFile = new MockJsTestFile
-      val event = NodejsTestImpl.runTest(mockJsTestFile.testPath, Array(logger))
+      val event = NodejsTestImpl.runTest(mockJsTestFile.testPath, Array.empty)
       assert(event.status() == Status.Success)
     }
     "failed-test" - {

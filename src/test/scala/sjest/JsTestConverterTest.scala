@@ -29,7 +29,7 @@ object JsTestConverterTest extends TestSuite {
   val tests = Tests {
     "test.js-generation" - {
       val path = JsTestConverter.generateJsTest(mockTestCase)
-      val expectedPath = mockConfig.testJsDir + mockTestCase.getFilename
+      val expectedPath = Path.resolve(mockConfig.testJsDir, mockTestCase.getFilename)
       assert(path == expectedPath)
       assert(Fs.existsSync(path))
 
