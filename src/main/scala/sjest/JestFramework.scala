@@ -3,6 +3,8 @@ package sjest
 import sbt.testing.{Fingerprint, Runner}
 import sjest.JestFramework.NodejsCmd
 
+import scala.scalajs.js
+
 abstract class JestFramework extends sbt.testing.Framework {
   override final def name(): String = "simple-jest"
 
@@ -38,7 +40,7 @@ abstract class JestFramework extends sbt.testing.Framework {
    * /dev/null is used to suppress jest output in sbt console.
    */
   protected def nodejsCmd(jsTestPath: String): NodejsCmd =
-    NodejsCmd("npm", Array("test", "--", jsTestPath, "--colors"))
+    NodejsCmd("npm", js.Array("test", "--", jsTestPath, "--colors"))
   /** Whether to run npm test in sbt. <br>
    * 'npm test -- xx.test.js' is executed for every test, thus worse performance.
    * One could disable it by set this to false, and manually run jest from command line.
@@ -46,6 +48,6 @@ abstract class JestFramework extends sbt.testing.Framework {
   protected def autoRunTestInSbt: Boolean = true
 }
 
-object JestFramework{
-  final case class NodejsCmd(cmd: String, args: Array[String])
+object JestFramework {
+  final case class NodejsCmd(cmd: String, args: js.Array[String])
 }

@@ -24,7 +24,9 @@ private object NodejsTestImpl {
           loggers.foreach(_.info(s"PASS ${taskDef.fullyQualifiedName}"))
           JestTestEvent(Status.Success)
         case _ =>
-          loggers.foreach(_.error(s"test failed: "))
+          loggers.foreach(_.error(s"test failed with error: ${childProcess.error}"))
+          loggers.foreach(_.error(s"${childProcess.stderr.toString}"))
+          loggers.foreach(_.error(s"${childProcess.stdout.toString}"))
           JestTestEvent(Status.Failure)
       }
     } catch {
@@ -36,7 +38,5 @@ private object NodejsTestImpl {
     val duration = (Deadline.now - startTime).toMillis
     event.copy(duration = duration)
   }
-
-
 
 }

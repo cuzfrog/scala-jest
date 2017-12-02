@@ -30,8 +30,3 @@ object JsTestStubTest extends TestSuite {
   }
 }
 
-private final class MockSuccessTest extends JestSuite {
-  test("mock test") {
-    JsTestStubTest.sideEffectMarker += 1
-  }
-}

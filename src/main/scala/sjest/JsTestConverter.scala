@@ -39,7 +39,5 @@ private object JsTestConverter {
                                (implicit config: TestFrameworkConfig): String = {
     Path.resolve(config.testJsDir, jsTestCase.getFilename)
   }
-
-  private def NEWLINE(implicit n: Int = 1) = System.lineSeparator() * n
 }
 
