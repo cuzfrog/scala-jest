@@ -1,6 +1,7 @@
 package sjest
 
 import sbt.testing.{SuiteSelector, TaskDef}
+import sjest.impl.JsTestStubTest
 
 import scala.scalajs.js
 
@@ -9,7 +10,7 @@ private object MockObjects {
     TestFrameworkConfig(
       optJsPath = "target/tmp/dir1/fastopt.js",
       testJsDir = "target/tmp/jests/",
-      nodejsCmdOfPath = _ => JestFramework.NodejsCmd("npm", js.Array("test")),
+      nodejsCmdOfPath = _ => JestFramework.NodejsCmd("/usr/bin/npm", js.Array("test")),
       autoRunTestInSbt = true
     )
 

@@ -1,6 +1,7 @@
 package sjest
 
 import sbt.testing.TaskDef
+import sjest.impl.JsTestCase
 import sjest.jest.JestApi
 
 import scala.scalajs.reflect.annotation.EnableReflectiveInstantiation

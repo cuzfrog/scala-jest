@@ -1,6 +1,9 @@
-const childProcess = require('child_process');
+var isWin = require('os').platform().indexOf('win') > -1;
 
-//const result = childProcess.spawnSync('npm',['test','--','target/tmp/jests/mock-test-fq6RH9tEug.test.js']);
-//const result = childProcess.execSync('npm test -- target/tmp/jests/mock-test-fq6RH9tEug.test.js');
-const result = childProcess.spawnSync('echo',['some-value'])
-console.log(result.stdout.toString());
+var where = isWin ? 'where' : 'whereis';
+
+var childProcess = require('child_process');
+
+var out = childProcess.spawnSync(where, ['lssdgasd']);
+
+console.log(out.status);

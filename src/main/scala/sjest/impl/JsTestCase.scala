@@ -1,21 +1,20 @@
-package sjest
+package sjest.impl
 
-import scala.collection.mutable
-import scala.collection.immutable
+import scala.collection.{immutable, mutable}
 import scala.scalajs.js
 
-private final class JsTestCase {
+private[sjest] final class JsTestCase {
 
   private var name: String = _
-  private val tests: mutable.Map[String, js.Function] = mutable.SortedMap.empty
+  private val tests: mutable.ArrayBuffer[(String, js.Function)] = mutable.ArrayBuffer.empty
 
   def add[T](description: String, testBlock: () => T): Unit = {
-    if (tests.get(description).isDefined)
+    if (tests.exists { case (descr, _) => descr == description })
       throw new IllegalArgumentException(s"Test description cannot be duplicated: '$description'")
     tests += (description -> testBlock)
   }
 
-  def getTests: Map[String, js.Function] = immutable.SortedMap(tests.toSeq.reverse: _*)
+  def getTests: Seq[(String, js.Function)] = tests.toList
 
   def setName(name: String): this.type = {
     require(name.matches("""[\w-_\.]*\$?"""), s"Bad module name: $name")

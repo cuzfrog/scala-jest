@@ -1,5 +1,6 @@
-package sjest
+package sjest.impl
 
+import sjest.MockSuccessTest
 import utest._
 
 import scala.scalajs.js

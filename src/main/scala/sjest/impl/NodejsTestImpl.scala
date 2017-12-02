@@ -1,14 +1,17 @@
-package sjest
+package sjest.impl
 
 import io.scalajs.nodejs.fs.Fs
 import sbt.testing.{Event, Logger, Status, TaskDef}
 import sjest.nodejs.{ChildProcess, ChildProcessOpt}
 import sjest.support.VisiableForTest
+import sjest.{JestFramework, TestFrameworkConfig}
 
 import scala.concurrent.duration.Deadline
 import scala.util.control.NonFatal
 
-private object NodejsTestImpl {
+import sjest.LoggersOps
+
+private class NodejsTestImpl extends NodejsTest {
 
   def runTest(jsTestPath: String, loggers: Array[Logger])
              (implicit taskDef: TaskDef, config: TestFrameworkConfig): Event = {
@@ -17,7 +20,6 @@ private object NodejsTestImpl {
     val event = try {
 
       val JestFramework.NodejsCmd(cmd, args) = config.nodejsCmdOfPath(jsTestPath)
-      if (!Fs.existsSync(cmd)) throw new IllegalArgumentException(s"Cannot find $cmd. Have you installed it?")
       val childProcess = ChildProcess.spawnSync(cmd, args) //run code with nodejs
 
       this.resolveChildProcess(childProcess, loggers)

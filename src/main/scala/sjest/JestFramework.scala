@@ -1,5 +1,6 @@
 package sjest
 
+import io.scalajs.nodejs.fs.Fs
 import sbt.testing.{Fingerprint, Runner}
 import sjest.JestFramework.NodejsCmd
 
@@ -49,5 +50,12 @@ abstract class JestFramework extends sbt.testing.Framework {
 }
 
 object JestFramework {
-  final case class NodejsCmd(cmd: String, args: js.Array[String])
+  final case class NodejsCmd(cmd: String, args: js.Array[String]) {
+    require(Fs.existsSync(cmd), s"Cannot find '$cmd', please use absolute path.")
+  }
 }
+
+private case class TestFrameworkConfig(optJsPath: String,
+                                       testJsDir: String,
+                                       nodejsCmdOfPath: String => JestFramework.NodejsCmd,
+                                       autoRunTestInSbt: Boolean)

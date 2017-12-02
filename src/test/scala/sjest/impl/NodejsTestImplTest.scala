@@ -1,9 +1,10 @@
-package sjest
+package sjest.impl
 
 import io.scalajs.nodejs.path.Path
 import sbt.testing.{Logger, Status, TaskDef}
 import sjest.JestFramework.NodejsCmd
 import sjest.nodejs.FSUtils
+import sjest.{MockObjects, TestFrameworkConfig}
 import utest._
 
 import scala.scalajs.js
@@ -11,8 +12,10 @@ import scala.util.Random
 
 object NodejsTestImplTest extends TestSuite {
 
+  private val nodejsTestImpl = NodejsTest()
+
   private implicit val mockConfig: TestFrameworkConfig = MockObjects.mockConfig.copy(
-    nodejsCmdOfPath = (jsTestPath: String) => NodejsCmd("npm", js.Array("test", "--", jsTestPath))
+    nodejsCmdOfPath = (jsTestPath: String) => NodejsCmd("/usr/bin/npm", js.Array("test", "--", jsTestPath))
   )
   private implicit val taskDef: TaskDef = MockObjects.newTaskDef("test-taskDef")
 
@@ -28,12 +31,12 @@ object NodejsTestImplTest extends TestSuite {
   val tests = Tests {
     "successful-test" - {
       val mockJsTestFile = new MockJsTestFile
-      val event = NodejsTestImpl.runTest(mockJsTestFile.testPath, Array.empty)
+      val event = nodejsTestImpl.runTest(mockJsTestFile.testPath, Array.empty)
       assert(event.status() == Status.Success)
     }
     "failed-test" - {
       val mockJsTestFile = new MockJsTestFileFailed
-      val event = NodejsTestImpl.runTest(mockJsTestFile.testPath, Array.empty)
+      val event = nodejsTestImpl.runTest(mockJsTestFile.testPath, Array.empty)
       assert(event.status() == Status.Failure)
     }
   }

@@ -1,7 +1,8 @@
-package sjest
+package sjest.impl
 
 import io.scalajs.nodejs.path.Path
 import sjest.nodejs.FSUtils
+import sjest.{NEWLINE, TestFrameworkConfig}
 
 private object JsTestConverter {
   /**
@@ -15,13 +16,12 @@ private object JsTestConverter {
     val module =
       s"""const out = require('${this.resolveOptJsPath}');
          |const loadTest = out.loadTest""".stripMargin
+
     val contents = jsTestCase.getTests.map { case (description, _) =>
       s"""test('$description', () => {
          |  loadTest('${jsTestCase.getName}','$description')();
          |});""".stripMargin
     }
-
-
 
     val content = module + NEWLINE(2) + contents.mkString(NEWLINE)
 

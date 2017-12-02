@@ -1,7 +1,8 @@
-package sjest
+package sjest.impl
 
 import io.scalajs.nodejs.fs.Fs
 import io.scalajs.nodejs.path.Path
+import sjest.MockObjects
 import sjest.nodejs.FSUtils
 import utest._
 

@@ -1,4 +1,4 @@
-package sjest
+package sjest.impl
 
 import sbt.testing._
 

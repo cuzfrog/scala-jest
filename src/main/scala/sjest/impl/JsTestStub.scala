@@ -1,4 +1,6 @@
-package sjest
+package sjest.impl
+
+import sjest.JestSuite
 
 import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExportTopLevel
@@ -12,7 +14,8 @@ private object JsTestStub {
       case None => throw new ClassNotFoundException(fqcn)
     }
 
-    testSuite.jsTestCase.getTests.get(keyDescription) match {
+    testSuite.jsTestCase.getTests
+      .collectFirst { case (desc, cb) if desc == keyDescription => cb } match {
       case Some(codeBlock) => codeBlock
       case None => throw new IllegalArgumentException(s"Cannot find test $keyDescription in $fqcn")
     }

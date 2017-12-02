@@ -1,6 +1,7 @@
 package sjest
 
 import sbt.testing.{Task, TaskDef}
+import sjest.impl.JestTask
 
 private class JestRunner(override val args: Array[String],
                          override val remoteArgs: Array[String],
