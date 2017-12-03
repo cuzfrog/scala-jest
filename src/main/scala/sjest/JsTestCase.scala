@@ -1,6 +1,6 @@
-package sjest.impl
+package sjest
 
-import scala.collection.{immutable, mutable}
+import scala.collection.mutable
 import scala.scalajs.js
 
 private[sjest] final class JsTestCase {

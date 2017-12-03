@@ -20,7 +20,7 @@ private[sjest] class JestTask(override val taskDef: TaskDef,
     val jsTestPath = JsTestConverter.generateJsTest(jsTestCase)
 
     val resultEvent =
-      if (config.autoRunTestInSbt) NodejsTest().runTest(jsTestPath, loggers)
+      if (config.autoRunTestInSbt) ImplModule.nodejsTest.runTest(jsTestPath, loggers)
       else {
         loggers.foreach(_.info("---jest--- test.js files are generated," +
           " manually run the tests because auto run has been disabled"))

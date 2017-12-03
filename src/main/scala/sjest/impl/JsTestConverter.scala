@@ -2,7 +2,7 @@ package sjest.impl
 
 import io.scalajs.nodejs.path.Path
 import sjest.nodejs.FSUtils
-import sjest.{NEWLINE, TestFrameworkConfig}
+import sjest.{JsTestCase, NEWLINE, TestFrameworkConfig}
 
 private object JsTestConverter {
   /**

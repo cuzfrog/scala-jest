@@ -1,5 +1,6 @@
 package sjest.impl
 
+import sjest.JsTestCase
 import utest._
 
 import scala.util.Random

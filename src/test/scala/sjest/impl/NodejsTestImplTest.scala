@@ -12,7 +12,7 @@ import scala.util.Random
 
 object NodejsTestImplTest extends TestSuite {
 
-  private val impl:NodejsTestImpl = NodejsTest().asInstanceOf[NodejsTestImpl]
+  private val impl:NodejsTestImpl = ImplModuleForTest.nodejsTestImpl
 
   private implicit val mockConfig: TestFrameworkConfig = MockObjects.mockConfig.copy(
     nodejsCmdOfPath = (jsTestPath: String) => NodejsCmd("/usr/bin/npm", js.Array("test", "--", jsTestPath))
