@@ -6,11 +6,10 @@ import scala.util.Random
 
 object TestStatisticsTest extends TestSuite {
 
-  private val impl = ImplModule.testStatistics
-  private val suiteCnt = Random.nextInt(5) + 1
-
   val tests = Tests {
-    'test {
+    val impl = ImplModule.testStatistics
+    val suiteCnt = Random.nextInt(5) + 1
+    'behavior {
       val suites = (1 to suiteCnt).map { _ =>
         val suite = new MockTestSuiteCnt
         suite.test(impl)
@@ -35,6 +34,12 @@ object TestStatisticsTest extends TestSuite {
 
       val expectedFailedSuiteCnt = suites.count(_.isFailed)
       assert(impl.failedSuiteCnt == expectedFailedSuiteCnt)
+    }
+    'state {
+      impl.successfulSuiteCnt
+      intercept[IllegalStateException]{
+        impl.incrementFailureTest()
+      }
     }
   }
 
