@@ -11,7 +11,7 @@ private class JestRunner(override val args: Array[String],
   private[this] val testStatistics = ImplModule.testStatistics
 
   override def tasks(taskDefs: Array[TaskDef]): Array[Task] =
-    taskDefs.map(new JestTask(_, testClassLoader))
+    taskDefs.map(new JestTask(_, testClassLoader, testStatistics))
 
   override def done(): String = {
     testStatistics.suitesReport + NEWLINE +
@@ -27,7 +27,7 @@ private class JestRunner(override val args: Array[String],
                              serializer: TaskDef => String): String = serializer(task.taskDef)
 
   override def deserializeTask(task: String, deserializer: String => TaskDef): Task = {
-    new JestTask(deserializer(task), testClassLoader)
+    new JestTask(deserializer(task), testClassLoader, testStatistics)
   }
 
 }
