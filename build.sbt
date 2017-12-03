@@ -16,6 +16,7 @@ val root = (project in file("."))
       "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion,
       "com.softwaremill.macwire" %% "macros" % "2.3.0" % Provided,
       "io.scalajs" %%% "nodejs" % "0.4.2",
+      "com.lihaoyi" %%% "fansi" % "0.2.5",
       "com.lihaoyi" %%% "utest" % "0.6.0" % Test
     ),
     testFrameworks += new TestFramework("utest.runner.Framework")

@@ -7,9 +7,10 @@ private[sjest] sealed trait JestOutputFilter extends Function1[String, String] {
 }
 
 private final class JestOutputFilterDefaultImpl extends JestOutputFilter {
-  private final val ansiRegex = """[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]"""
+  private final val ansiRegex = fansi.Str.ansiRegex.pattern()
 
   def apply(in: String): String = {
+
     val originalLines = in.split(raw"""$NEWLINE""").map(removePrefixComma)
     val noAnsiLines = originalLines.map(_.replaceAll(ansiRegex, ""))
 
