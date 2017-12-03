@@ -19,7 +19,7 @@ private class NodejsTestImpl extends NodejsTest {
   def runTest(jsTestPath: String, loggers: Array[Logger])
              (implicit taskDef: TaskDef, config: TestFrameworkConfig): Event = {
     val startTime = Deadline.now
-    loggers.info(s"---jest--- Testing against: ${taskDef.fullyQualifiedName}")
+    loggers.info(s"Testing ${fansi.Bold.On(taskDef.fullyQualifiedName)}")
     val event = try {
 
       val JestFramework.NodejsCmd(cmd, args) = config.nodejsCmdOfPath(jsTestPath)
@@ -28,7 +28,7 @@ private class NodejsTestImpl extends NodejsTest {
       this.resolveChildProcess(childProcess, loggers)
     } catch {
       case NonFatal(t) =>
-        loggers.error(s"Test failed with $t}")
+        loggers.error(s"Test failed with ${fansi.Color.Red(t.toString)}")
         JestTestEvent(Status.Failure)
     }
 
@@ -41,18 +41,14 @@ private class NodejsTestImpl extends NodejsTest {
     childProcess.status match {
       case 0 =>
         val output = childProcess.outputOpt.map(config.jestOutputFilter)
-        output.foreach { out =>
-          loggers.info(out)
-          FSUtils.write("/tmp/test-log", out)
-        }
+        output.foreach(loggers.info)
         JestTestEvent(Status.Success)
       case _ =>
-        childProcess.stderrOpt.map(config.jestOutputFilter).foreach(loggers.error)
-
-        //        loggers.error(s"test failed with error: ${childProcess.error}")
-        //        loggers.foreach(_.error(s"${childProcess.stderr.toString}"))
-
+        val output = childProcess.stderrOpt.map(config.jestOutputFilter)
+        output.foreach(loggers.error)
         JestTestEvent(Status.Failure)
     }
   }
+
+
 }
