@@ -6,13 +6,12 @@ import sjest.impl.JsTestStubTest
 import scala.scalajs.js
 
 private object MockObjects {
-  implicit val mockConfig: TestFrameworkConfig =
-    TestFrameworkConfig(
-      optJsPath = "target/tmp/dir1/fastopt.js",
-      testJsDir = "target/tmp/jests/",
-      nodejsCmdOfPath = _ => JestFramework.NodejsCmd("/usr/bin/npm", js.Array("test")),
-      autoRunTestInSbt = true
-    )
+  implicit val mockConfig: TestFrameworkConfig = JestFramework.defaultConfig.copy(
+    optJsPath = "target/tmp/dir1/fastopt.js",
+    testJsDir = "target/tmp/jests/",
+    nodejsCmdOfPath = _ => JestFramework.NodejsCmd("/usr/bin/npm", js.Array("test")),
+    autoRunTestInSbt = true
+  )
 
   def newTaskDef(fqcn: String): TaskDef =
     new TaskDef(

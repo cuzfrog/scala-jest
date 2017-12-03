@@ -2,13 +2,13 @@ package sjest.impl
 
 import com.softwaremill.macwire._
 
-private sealed trait ImplModule {
-  lazy val jestOutputFilter: JestOutputFilter = wire[JestOutputFilterDefaultImpl]
-  lazy val nodejsTest: NodejsTest = wire[NodejsTestImpl]
+private[sjest] sealed trait ImplModule {
+  lazy final val jestOutputFilter: JestOutputFilter = wire[JestOutputFilterDefaultImpl]
+  lazy final val nodejsTest: NodejsTest = wire[NodejsTestImpl]
 }
 
-private object ImplModule extends ImplModule
+private[sjest] object ImplModule extends ImplModule
 
 private object ImplModuleForTest extends ImplModule {
-  lazy val nodejsTestImpl: NodejsTestImpl = wire[NodejsTestImpl]
+  lazy final val nodejsTestImpl: NodejsTestImpl = wire[NodejsTestImpl]
 }

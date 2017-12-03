@@ -14,7 +14,7 @@ private[sjest] sealed trait NodejsTest {
              (implicit taskDef: TaskDef, config: TestFrameworkConfig): Event
 }
 
-private class NodejsTestImpl(jestOutputFilter: JestOutputFilter) extends NodejsTest {
+private class NodejsTestImpl extends NodejsTest {
 
   def runTest(jsTestPath: String, loggers: Array[Logger])
              (implicit taskDef: TaskDef, config: TestFrameworkConfig): Event = {
@@ -37,10 +37,10 @@ private class NodejsTestImpl(jestOutputFilter: JestOutputFilter) extends NodejsT
   }
 
   private def resolveChildProcess(childProcess: ChildProcessOpt, loggers: Array[Logger])
-                                 (implicit taskDef: TaskDef): JestTestEvent = {
+                                 (implicit taskDef: TaskDef, config: TestFrameworkConfig): JestTestEvent = {
     childProcess.status match {
       case 0 =>
-        val output = childProcess.outputOpt.map(jestOutputFilter.filterJestOutput)
+        val output = childProcess.outputOpt.map(config.jestOutputFilter)
         output.foreach { out =>
           loggers.info(out)
           FSUtils.write("/tmp/test-log", out)
