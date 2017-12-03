@@ -47,7 +47,7 @@ private class NodejsTestImpl extends NodejsTest {
         }
         JestTestEvent(Status.Success)
       case _ =>
-        childProcess.stderrOpt.foreach(loggers.error)
+        childProcess.stderrOpt.map(config.jestOutputFilter).foreach(loggers.error)
 
         //        loggers.error(s"test failed with error: ${childProcess.error}")
         //        loggers.foreach(_.error(s"${childProcess.stderr.toString}"))

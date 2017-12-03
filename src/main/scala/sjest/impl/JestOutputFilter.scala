@@ -2,25 +2,34 @@ package sjest.impl
 
 import sjest.NEWLINE
 
-private[sjest] sealed trait JestOutputFilter extends Function1[String,String]{
+private[sjest] sealed trait JestOutputFilter extends Function1[String, String] {
   def apply(in: String): String
-}
-
-private object JestOutputFilter{
-  implicit val defaultImpl: JestOutputFilter = new JestOutputFilterDefaultImpl
 }
 
 private final class JestOutputFilterDefaultImpl extends JestOutputFilter {
   private final val ansiRegex = """[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]"""
 
   def apply(in: String): String = {
-    val lines = in.replaceAll(ansiRegex, "").split(raw"""$NEWLINE""")
-    val filtered = lines.filter { line =>
-      line.trim.nonEmpty &&
-        !line.startsWith(",[BABEL] Note: The code generator has deoptimised the styling of") &&
+    val originalLines = in.split(raw"""$NEWLINE""").map(removePrefixComma)
+    val noAnsiLines = originalLines.map(_.replaceAll(ansiRegex, ""))
+
+    val lines = originalLines zip noAnsiLines
+
+    val filtered = lines.collect { case (original, line)
+      if line.trim.nonEmpty &&
+        !line.startsWith("[BABEL] Note: The code generator has deoptimised the styling of") &&
         !line.startsWith("Ran all test suites matching") &&
-        !line.startsWith("Test Suites: 1 passed, 1 total")
+        !line.startsWith("Tests:") &&
+        !line.startsWith("Test Suites:") &&
+        !line.startsWith("Snapshots:") &&
+        !line.startsWith("""Time:""") =>
+      original
     }
     filtered.mkString(NEWLINE)
+  }
+
+  private def removePrefixComma(line: String): String = {
+    if(line.startsWith(",")) line.drop(1)
+    else line
   }
 }
