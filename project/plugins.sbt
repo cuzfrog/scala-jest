@@ -1,4 +1,4 @@
-addSbtPlugin("com.github.cuzfrog" % "sbt-tmpfs" % "0.3.2-SNAPSHOT")
+addSbtPlugin("com.github.cuzfrog" % "sbt-tmpfs" % "0.3.2")
 
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.21")
 
