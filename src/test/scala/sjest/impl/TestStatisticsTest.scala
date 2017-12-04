@@ -6,11 +6,8 @@ import scala.util.Random
 
 object TestStatisticsTest extends TestSuite {
 
-  private val impl = ModuleForTest().testStatistics
-
-  override def utestAfterEach(path: Seq[String]): Unit = impl.reset()
-
   val tests = Tests {
+    val impl = ModuleForTest().Prototype.testStatistics
     val suiteCnt = Random.nextInt(5) + 1
     'behavior {
       val suites = (1 to suiteCnt).map { _ =>

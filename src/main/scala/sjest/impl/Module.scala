@@ -40,12 +40,12 @@ private class ImplementationModule(args: Array[String],
   private def jestRunnerRemoteArgs: JestRunner.RemoteArgs = new impl.JestRunner.RemoteArgs(args)
 
   // ------ Singletons ------
-  lazy val testStatistics: TestStatistics = wire[TestStatisticsImpl]
-  lazy val taskFactory: TaskFactory = (taskDef: TaskDef) => wire[JestTask]
+  protected lazy val testStatistics: TestStatistics = wire[TestStatisticsImpl]
+  protected lazy val taskFactory: TaskFactory = (taskDef: TaskDef) => wire[JestTask]
 
   // ------ Prototypes ------
-  def jestOutputParser: JestOutputParser = wire[JestOutputParserImpl]
-  def jsTestConverter: JsTestConverter = wire[JsTestConverterImpl]
-  def nodejsTest: NodejsTest = wire[NodejsTestImpl]
+  protected def jestOutputParser: JestOutputParser = wire[JestOutputParserImpl]
+  protected def jsTestConverter: JsTestConverter = wire[JsTestConverterImpl]
+  protected def nodejsTest: NodejsTest = wire[NodejsTestImpl]
   def injectRunner: sbt.testing.Runner = wire[JestRunner]
 }

@@ -8,9 +8,7 @@ import scala.scalajs.js
 private object MockObjects {
   implicit val mockConfig: TestFrameworkConfig = JestFramework.defaultConfig.copy(
     optJsPath = "target/tmp/dir1/fastopt.js",
-    testJsDir = "target/tmp/jests/",
-    nodejsCmdOfPath = _ => JestFramework.NodejsCmd("/usr/bin/npm", js.Array("test")),
-    autoRunTestInSbt = true
+    testJsDir = "target/tmp/jests/"
   )
 
   def newTaskDef(fqcn: String): TaskDef =

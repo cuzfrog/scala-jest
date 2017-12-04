@@ -9,9 +9,6 @@ import utest._
 import scala.util.Random
 
 object JsTestConverterTest extends TestSuite {
-
-  private val impl = ModuleForTest().jsTestConverter
-
   private val descripton1 = Random.genAlphanumeric(20)
   private val descripton2 = Random.genAlphanumeric(20)
 
@@ -23,7 +20,9 @@ object JsTestConverterTest extends TestSuite {
     jsTestCase.setName(randomName)
   }
 
-  import MockObjects.mockConfig
+  import MockObjects.mockConfig //implicit config
+
+  private val impl = ModuleForTest().Prototype.jsTestConverter
 
   override def utestAfterAll(): Unit = { //tear down
     FSUtils.delete(mockConfig.testJsDir)

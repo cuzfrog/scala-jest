@@ -22,8 +22,6 @@ private sealed trait TestStatistics {
 
   def testsReport: String
   def suitesReport: String
-
-  def reset(): Unit
 }
 
 private final class TestStatisticsImpl extends TestStatistics {
@@ -92,11 +90,5 @@ private final class TestStatisticsImpl extends TestStatistics {
     val success = if (successfulSuiteCnt > 0) fansi.Color.Green(successfulSuiteCnt + " passed, ") else ""
     val failure = if (failedSuiteCnt > 0) fansi.Color.Red(failedSuiteCnt + " failed, ") else ""
     s"Test Suites: $failure$success$total"
-  }
-  override def reset(): Unit = {
-    successCount = 0
-    failureCount = 0
-    suites.clear()
-    deposited = false
   }
 }

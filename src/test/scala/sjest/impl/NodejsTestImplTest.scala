@@ -13,27 +13,17 @@ import scala.util.Random
 object NodejsTestImplTest extends TestSuite {
 
 
-
-  private implicit val mockConfig: TestFrameworkConfig = MockObjects.mockConfig.copy(
-    nodejsCmdOfPath = (jsTestPath: String) => NodejsCmd("/usr/bin/npm", js.Array("test", "--", jsTestPath))
-  )
-  private val impl: NodejsTestImpl = ModuleForTest().nodejsTestImpl
-
+  private implicit val mockConfig: TestFrameworkConfig = MockObjects.mockConfig
+  private val impl: NodejsTestImpl = ModuleForTest().Prototype.nodejsTestImpl
   private implicit val taskDef: TaskDef = MockObjects.newTaskDef("test-taskDef")
 
-  private val logger = new Logger {
-    override def ansiCodesSupported(): Boolean = false
-    override def debug(msg: String): Unit = ???
-    override def error(msg: String): Unit = println("[error]" + msg)
-    override def warn(msg: String): Unit = ???
-    override def trace(t: Throwable): Unit = ???
-    override def info(msg: String): Unit = println("[info ]" + msg)
-  }
 
   val tests = Tests {
+    val logger = new TestLogger
     "successful-test" - {
       val mockJsTestFile = new MockJsTestFile
-      val event = impl.runTest(mockJsTestFile.testPath, Array.empty)
+      val event = impl.runTest(mockJsTestFile.testPath, Array(logger))
+      if(event.status() != Status.Success) logger.flush()
       assert(event.status() == Status.Success)
     }
     "failed-test" - {

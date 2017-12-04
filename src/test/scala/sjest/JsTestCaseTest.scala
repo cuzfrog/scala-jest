@@ -1,9 +1,9 @@
-package sjest.impl
+package sjest
 
-import sjest.JsTestCase
 import utest._
 
 import scala.util.Random
+import sjest.impl.ExRandom
 
 object JsTestCaseTest extends TestSuite {
 
