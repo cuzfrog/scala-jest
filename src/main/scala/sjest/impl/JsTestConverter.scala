@@ -2,16 +2,23 @@ package sjest.impl
 
 import io.scalajs.nodejs.path.Path
 import sjest.nodejs.FSUtils
-import sjest.{JsTestCase, NEWLINE, TestFrameworkConfig}
+import sjest.support.Stateless
+import sjest.{JsTestCase, TestFrameworkConfig}
 
-private object JsTestConverter {
+@Stateless
+private sealed trait JsTestConverter {
   /**
    * Generate *.test.js file.
    *
    * @return the generated file path.
    */
-  def generateJsTest(jsTestCase: JsTestCase)
-                    (implicit config: TestFrameworkConfig): String = {
+  def generateJsTest(jsTestCase: JsTestCase): String
+}
+
+private final class JsTestConverterImpl(implicit config: TestFrameworkConfig)
+  extends JsTestConverter {
+
+  def generateJsTest(jsTestCase: JsTestCase): String = {
 
     val module =
       s"""const out = require('${this.resolveOptJsPath}');

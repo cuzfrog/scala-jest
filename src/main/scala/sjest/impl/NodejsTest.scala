@@ -1,22 +1,23 @@
 package sjest.impl
 
 import sbt.testing.{Event, Logger, Status, TaskDef}
+import sjest.nodejs.{ChildProcess, ChildProcessOpt}
+import sjest.support.SideEffect
 import sjest.{JestFramework, TestFrameworkConfig}
-import sjest.nodejs.{ChildProcess, ChildProcessOpt, FSUtils}
 
 import scala.concurrent.duration.Deadline
 import scala.util.control.NonFatal
-import sjest.LoggersOps
 
-private[sjest] sealed trait NodejsTest {
-  def runTest(jsTestPath: String, loggers: Array[Logger], testStatistics: TestStatistics)
-             (implicit taskDef: TaskDef, config: TestFrameworkConfig): Event
+private sealed trait NodejsTest {
+  def runTest(jsTestPath: String, loggers: Array[Logger])(implicit taskDef: TaskDef): Event
 }
 
-private class NodejsTestImpl(jestOutputParser: JestOutputParser) extends NodejsTest {
+private class NodejsTestImpl(jestOutputParser: JestOutputParser,
+                             testStatistics: TestStatistics)
+                            (implicit config: TestFrameworkConfig) extends NodejsTest {
 
-  def runTest(jsTestPath: String, loggers: Array[Logger], testStatistics: TestStatistics)
-             (implicit taskDef: TaskDef, config: TestFrameworkConfig): Event = {
+  @SideEffect(this.testStatistics)
+  def runTest(jsTestPath: String, loggers: Array[Logger])(implicit taskDef: TaskDef): Event = {
     val startTime = Deadline.now
     loggers.info(s"Testing ${fansi.Bold.On(taskDef.fullyQualifiedName)}")
     val event = try {
@@ -24,7 +25,7 @@ private class NodejsTestImpl(jestOutputParser: JestOutputParser) extends NodejsT
       val JestFramework.NodejsCmd(cmd, args) = config.nodejsCmdOfPath(jsTestPath)
       val childProcess = ChildProcess.spawnSync(cmd, args) //run code with nodejs
 
-      this.resolveChildProcess(childProcess, loggers, testStatistics)
+      this.resolveChildProcess(childProcess, loggers)
     } catch {
       case NonFatal(t) =>
         loggers.error(s"Test failed with ${fansi.Color.Red(t.toString)}")
@@ -32,12 +33,13 @@ private class NodejsTestImpl(jestOutputParser: JestOutputParser) extends NodejsT
     }
 
     val duration = (Deadline.now - startTime).toMillis
+    testStatistics.nextTestSuite()
     event.copy(duration = duration)
   }
 
+  @SideEffect(this.testStatistics)
   private def resolveChildProcess(childProcess: ChildProcessOpt,
-                                  loggers: Array[Logger],
-                                  testStatistics: TestStatistics)
+                                  loggers: Array[Logger])
                                  (implicit taskDef: TaskDef, config: TestFrameworkConfig): JestTestEvent = {
     val (status, outputOpt) = childProcess.status match {
       case 0 =>

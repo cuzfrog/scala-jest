@@ -12,13 +12,14 @@ import scala.util.Random
 
 object NodejsTestImplTest extends TestSuite {
 
-  private val impl: NodejsTestImpl = ImplModuleForTest.nodejsTestImpl
+
 
   private implicit val mockConfig: TestFrameworkConfig = MockObjects.mockConfig.copy(
     nodejsCmdOfPath = (jsTestPath: String) => NodejsCmd("/usr/bin/npm", js.Array("test", "--", jsTestPath))
   )
+  private val impl: NodejsTestImpl = ModuleForTest().nodejsTestImpl
+
   private implicit val taskDef: TaskDef = MockObjects.newTaskDef("test-taskDef")
-  private val testStatistics = ImplModule.testStatistics
 
   private val logger = new Logger {
     override def ansiCodesSupported(): Boolean = false
@@ -32,16 +33,13 @@ object NodejsTestImplTest extends TestSuite {
   val tests = Tests {
     "successful-test" - {
       val mockJsTestFile = new MockJsTestFile
-      val event = impl.runTest(mockJsTestFile.testPath, Array.empty, testStatistics)
+      val event = impl.runTest(mockJsTestFile.testPath, Array.empty)
       assert(event.status() == Status.Success)
     }
     "failed-test" - {
       val mockJsTestFile = new MockJsTestFileFailed
-      val event = impl.runTest(mockJsTestFile.testPath, Array.empty, testStatistics)
+      val event = impl.runTest(mockJsTestFile.testPath, Array.empty)
       assert(event.status() == Status.Failure)
-    }
-    "parseJestOutput" - {
-      //val out = impl.parseJestOutput()
     }
   }
 }

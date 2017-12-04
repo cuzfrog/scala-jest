@@ -1,9 +1,14 @@
 package sjest.impl
 
-import sjest.NEWLINE
+import sjest.support.Stateless
 
-private[sjest] sealed trait JestOutputFilter extends Function1[String, String] {
+@Stateless
+private sealed trait JestOutputFilter extends Function1[String, String] {
   def apply(in: String): String
+}
+
+private object JestOutputFilter {
+  val instance: JestOutputFilter = new JestOutputFilterDefaultImpl
 }
 
 private final class JestOutputFilterDefaultImpl extends JestOutputFilter {
@@ -30,7 +35,7 @@ private final class JestOutputFilterDefaultImpl extends JestOutputFilter {
   }
 
   private def removePrefixComma(line: String): String = {
-    if(line.startsWith(",")) line.drop(1)
+    if (line.startsWith(",")) line.drop(1)
     else line
   }
 }

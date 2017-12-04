@@ -10,6 +10,8 @@ import scala.util.Random
 
 object JsTestConverterTest extends TestSuite {
 
+  private val impl = ModuleForTest().jsTestConverter
+
   private val descripton1 = Random.genAlphanumeric(20)
   private val descripton2 = Random.genAlphanumeric(20)
 
@@ -29,7 +31,7 @@ object JsTestConverterTest extends TestSuite {
 
   val tests = Tests {
     "test.js-generation" - {
-      val path = JsTestConverter.generateJsTest(mockTestCase)
+      val path = impl.generateJsTest(mockTestCase)
       val expectedPath = Path.resolve(mockConfig.testJsDir, mockTestCase.getFilename)
       assert(path == expectedPath)
       assert(Fs.existsSync(path))

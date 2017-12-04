@@ -1,6 +1,14 @@
+package sjest
+
 import sbt.testing.Logger
 
-package object sjest {
+import scala.util.Random
+
+package object impl {
+  private[sjest] implicit class ExRandom(r: Random) {
+    def genAlphanumeric(n: Int): String = r.alphanumeric.take(n).mkString
+  }
+
   private[sjest] def NEWLINE: String = NEWLINE()
   private[sjest] def NEWLINE(n: Int = 1): String = System.lineSeparator() * n
 

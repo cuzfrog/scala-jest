@@ -5,10 +5,11 @@ import sbt.testing._
 import sjest.support.VisibleForTest
 import sjest.{JestSuite, TestFrameworkConfig}
 
-private[sjest] class JestTask(override val taskDef: TaskDef,
-                              testClassLoader: ClassLoader,
-                              testStatistics: TestStatistics)
-                             (implicit config: TestFrameworkConfig) extends sbt.testing.Task {
+private class JestTask(override val taskDef: TaskDef,
+                       testClassLoader: ClassLoader,
+                       jsTestConverter: JsTestConverter,
+                       nodejsTest: NodejsTest)
+                      (implicit config: TestFrameworkConfig) extends sbt.testing.Task {
   override def tags(): Array[String] = Array("jest-test-task")
 
   override def execute(eventHandler: EventHandler,
@@ -33,16 +34,15 @@ private[sjest] class JestTask(override val taskDef: TaskDef,
       testClassLoader, Seq.empty)(Seq.empty).asInstanceOf[JestSuite]
 
     val jsTestCase = suite.getTestCase(taskDef)
-    val jsTestPath = JsTestConverter.generateJsTest(jsTestCase)
+    val jsTestPath = jsTestConverter.generateJsTest(jsTestCase)
 
     val event = if (config.autoRunTestInSbt)
-      ImplModule.nodejsTest.runTest(jsTestPath, loggers, testStatistics)
+      nodejsTest.runTest(jsTestPath, loggers)
     else {
       loggers.foreach(_.info("*.test.js files are generated," +
         " manually run the tests because auto run has been disabled"))
       JestTestEvent(Status.Ignored)
     }
-    testStatistics.nextTestSuite()
     event
   }
 }

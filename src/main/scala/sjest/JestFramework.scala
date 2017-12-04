@@ -3,7 +3,7 @@ package sjest
 import io.scalajs.nodejs.fs.Fs
 import sbt.testing.{Fingerprint, Runner}
 import sjest.JestFramework.NodejsCmd
-import sjest.impl.ImplModule
+import sjest.impl.Module
 
 import scala.scalajs.js
 
@@ -15,14 +15,14 @@ abstract class JestFramework extends sbt.testing.Framework {
   override final def runner(args: Array[String],
                             remoteArgs: Array[String],
                             testClassLoader: ClassLoader): Runner = {
-    new JestRunner(args, remoteArgs, testClassLoader)
+    Module.init(args, remoteArgs, testClassLoader).injectRunner
   }
 
   override final def slaveRunner(args: Array[String],
                                  remoteArgs: Array[String],
                                  testClassLoader: ClassLoader,
                                  send: String => Unit): Runner = {
-    new JestRunner(args, remoteArgs, testClassLoader)
+    this.runner(args, remoteArgs, testClassLoader)
   }
 
   private implicit final def assembleConfig: TestFrameworkConfig = {
@@ -60,13 +60,13 @@ object JestFramework {
     require(Fs.existsSync(cmd), s"Cannot find '$cmd', please use path.")
   }
 
-  private[sjest] val defaultConfig = TestFrameworkConfig(
+  private[sjest] lazy val defaultConfig = TestFrameworkConfig(
     optJsPath = "",
     testJsDir = "./target/simple-jests/",
     nodejsCmdOfPath = (jsTestPath: String) =>
       NodejsCmd("node_modules/jest/bin/jest.js", js.Array("--colors", jsTestPath)),
     autoRunTestInSbt = true,
-    jestOutputFilter = ImplModule.jestOutputFilter
+    jestOutputFilter = Module.defaultJestOutputFilter
   )
 }
 
