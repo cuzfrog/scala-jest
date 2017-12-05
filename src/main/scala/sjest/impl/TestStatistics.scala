@@ -6,22 +6,23 @@ import scala.collection.mutable.ArrayBuffer
 
 @Stateful
 private sealed trait TestStatistics {
-  def incrementSuccessTest(n: Int = 1): Unit
-  def incrementFailureTest(n: Int = 1): Unit
+  def incrementPassedTest(n: Int = 1): Unit
+  def incrementFailedTest(n: Int = 1): Unit
   def nextTestSuite(): Unit
 
   def totalTestCnt: Int
-  def successfulTestCnt: Int
+  def passedTestCnt: Int
   def failedTestCnt: Int
 
   def totalSuiteCnt: Int
-  def successfulSuiteCnt: Int
+  def passedSuiteCnt: Int
   def failedSuiteCnt: Int
 
-  def isAllPassed: Boolean = totalSuiteCnt == successfulSuiteCnt
+  def isAllPassed: Boolean = totalSuiteCnt == passedSuiteCnt
 
   def testsReport: String
   def suitesReport: String
+  def report: String = suitesReport + NEWLINE + testsReport
 }
 
 private final class TestStatisticsImpl extends TestStatistics {
@@ -31,11 +32,11 @@ private final class TestStatisticsImpl extends TestStatistics {
   private val suites: ArrayBuffer[(Int, Int)] = ArrayBuffer.empty
   private var deposited: Boolean = false
 
-  override def incrementSuccessTest(n: Int): Unit = {
+  override def incrementPassedTest(n: Int): Unit = {
     checkIfDeposited()
     successCount += n
   }
-  override def incrementFailureTest(n: Int): Unit = {
+  override def incrementFailedTest(n: Int): Unit = {
     checkIfDeposited()
     failureCount += n
   }
@@ -50,7 +51,7 @@ private final class TestStatisticsImpl extends TestStatistics {
     deposit()
     suites.map { case (s, f) => s + f }.reduceOption(_ + _).getOrElse(0)
   }
-  override lazy val successfulTestCnt: Int = {
+  override lazy val passedTestCnt: Int = {
     deposit()
     suites.map { case (s, _) => s }.reduceOption(_ + _).getOrElse(0)
   }
@@ -62,7 +63,7 @@ private final class TestStatisticsImpl extends TestStatistics {
     deposit()
     suites.size
   }
-  override lazy val successfulSuiteCnt: Int = {
+  override lazy val passedSuiteCnt: Int = {
     deposit()
     suites.count { case (_, f) => f == 0 }
   }
@@ -81,13 +82,13 @@ private final class TestStatisticsImpl extends TestStatistics {
 
   override def testsReport: String = {
     val total = totalTestCnt + " total"
-    val success = if (successfulTestCnt > 0) fansi.Color.Green(successfulTestCnt + " passed, ") else ""
+    val success = if (passedTestCnt > 0) fansi.Color.Green(passedTestCnt + " passed, ") else ""
     val failure = if (failedTestCnt > 0) fansi.Color.Red(failedTestCnt + " failed, ") else ""
     s"Test       : $failure$success$total"
   }
   override def suitesReport: String = {
     val total = totalSuiteCnt + " total"
-    val success = if (successfulSuiteCnt > 0) fansi.Color.Green(successfulSuiteCnt + " passed, ") else ""
+    val success = if (passedSuiteCnt > 0) fansi.Color.Green(passedSuiteCnt + " passed, ") else ""
     val failure = if (failedSuiteCnt > 0) fansi.Color.Red(failedSuiteCnt + " failed, ") else ""
     s"Test Suites: $failure$success$total"
   }

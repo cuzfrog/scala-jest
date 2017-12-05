@@ -58,7 +58,7 @@ private class NodejsTestImpl(jestOutputParser: JestOutputParser,
   @SideEffect(testStatistics)
   private def countTestResult(jestOutput: String): Unit = {
     val result = jestOutputParser.extractStatistics(jestOutput)
-    testStatistics.incrementSuccessTest(result.passed)
-    testStatistics.incrementFailureTest(result.failed)
+    testStatistics.incrementPassedTest(result.passed)
+    testStatistics.incrementFailedTest(result.failed)
   }
 }

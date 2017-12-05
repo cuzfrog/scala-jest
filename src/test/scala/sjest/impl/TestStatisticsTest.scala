@@ -21,7 +21,7 @@ object TestStatisticsTest extends TestSuite {
       assert(impl.totalTestCnt == expectedTotalTestCnt)
 
       val expectedSuccessfulTestCnt = suites.map(_.successfulTestCnt).sum
-      assert(impl.successfulTestCnt == expectedSuccessfulTestCnt)
+      assert(impl.passedTestCnt == expectedSuccessfulTestCnt)
 
       val expectedFailedTestCnt = suites.map(_.failedTestCnt).sum
       assert(impl.failedTestCnt == expectedFailedTestCnt)
@@ -30,15 +30,15 @@ object TestStatisticsTest extends TestSuite {
       assert(impl.totalSuiteCnt == expectedTotalSuiteCnt)
 
       val expectedSuccessfulSuiteCnt = suites.count(_.isFailed.unary_!)
-      assert(impl.successfulSuiteCnt == expectedSuccessfulSuiteCnt)
+      assert(impl.passedSuiteCnt == expectedSuccessfulSuiteCnt)
 
       val expectedFailedSuiteCnt = suites.count(_.isFailed)
       assert(impl.failedSuiteCnt == expectedFailedSuiteCnt)
     }
     'state {
-      impl.successfulSuiteCnt
+      impl.passedSuiteCnt
       intercept[IllegalStateException]{
-        impl.incrementFailureTest()
+        impl.incrementFailedTest()
       }
     }
   }
@@ -49,8 +49,8 @@ object TestStatisticsTest extends TestSuite {
     val totalCnt: Int = successfulTestCnt + failedTestCnt
 
     def test(testStatistics: TestStatistics): Unit = {
-      (1 to successfulTestCnt).foreach(_ => testStatistics.incrementSuccessTest())
-      (1 to failedTestCnt).foreach(_ => testStatistics.incrementFailureTest())
+      (1 to successfulTestCnt).foreach(_ => testStatistics.incrementPassedTest())
+      (1 to failedTestCnt).foreach(_ => testStatistics.incrementFailedTest())
     }
 
     def isFailed: Boolean = failedTestCnt > 0

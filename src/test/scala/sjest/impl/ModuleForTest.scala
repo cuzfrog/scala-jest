@@ -11,7 +11,10 @@ case class ModuleForTest(args: Array[String] = Array.empty,
     with Product with Serializable { module =>
 
   object Singleton {
-    def testStatistics: TestStatistics = module.testStatistics
+    //lazy val jsTestConverter: JsTestConverter = module.jsTestConverter
+    lazy val jestOutputParser: JestOutputParser = module.jestOutputParser
+    lazy val testStatistics: TestStatistics = module.testStatistics
+    lazy val nodejsTestImpl: NodejsTestImpl = wire[NodejsTestImpl]
   }
 
   object Prototype {
