@@ -30,11 +30,11 @@ private class JestTask(override val taskDef: TaskDef,
 
   @VisibleForTest
   private[sjest] def executeImpl(loggers: Array[Logger]): Event = {
-    validateConfig()
+    JestTask.validateConfig(config)
 
     implicit val _taskDef: TaskDef = taskDef
 
-    val suite = this.loadJestSuite
+    val suite = JestTask.loadJestSuite(taskDef.fullyQualifiedName())
 
     val jsTestCase = suite.getTestCase(taskDef)
     val jsTestPath = jsTestConverter.generateJsTest(jsTestCase)
@@ -49,10 +49,11 @@ private class JestTask(override val taskDef: TaskDef,
     }
     event
   }
+}
 
+private object JestTask {
   @throws[IllegalArgumentException]("when suite load fails.")
-  private def loadJestSuite: JestSuite = {
-    val fqcn = taskDef.fullyQualifiedName()
+  private def loadJestSuite(fqcn: String): JestSuite = {
     Try {
       Reflect.lookupInstantiatableClass(fqcn) match {
         case Some(clazz) => clazz.newInstance().asInstanceOf[JestSuite]
@@ -66,7 +67,7 @@ private class JestTask(override val taskDef: TaskDef,
   }
 
   @throws[IllegalArgumentException]
-  private def validateConfig(): Unit = {
+  private def validateConfig(config: TestFrameworkConfig): Unit = {
     require(Fs.existsSync(config.optJsPath), s"Cannot find ${config.optJsPath}")
   }
 }
