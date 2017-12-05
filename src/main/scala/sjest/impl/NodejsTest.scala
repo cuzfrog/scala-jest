@@ -2,7 +2,7 @@ package sjest.impl
 
 import sbt.testing.{Event, Logger, Status, TaskDef}
 import sjest.nodejs.{ChildProcess, ChildProcessOpt}
-import sjest.support.{SideEffect, VisibleForTest}
+import sjest.support.SideEffect
 import sjest.{JestFramework, TestFrameworkConfig}
 
 import scala.concurrent.duration.Deadline

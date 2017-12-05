@@ -20,8 +20,8 @@ object TestStatisticsTest extends TestSuite {
       val expectedTotalTestCnt = suites.map(_.totalCnt).sum
       assert(impl.totalTestCnt == expectedTotalTestCnt)
 
-      val expectedSuccessfulTestCnt = suites.map(_.successfulTestCnt).sum
-      assert(impl.passedTestCnt == expectedSuccessfulTestCnt)
+      val expectedPassedTestCnt = suites.map(_.successfulTestCnt).sum
+      assert(impl.passedTestCnt == expectedPassedTestCnt)
 
       val expectedFailedTestCnt = suites.map(_.failedTestCnt).sum
       assert(impl.failedTestCnt == expectedFailedTestCnt)
@@ -29,19 +29,36 @@ object TestStatisticsTest extends TestSuite {
       val expectedTotalSuiteCnt = suites.size
       assert(impl.totalSuiteCnt == expectedTotalSuiteCnt)
 
-      val expectedSuccessfulSuiteCnt = suites.count(_.isFailed.unary_!)
-      assert(impl.passedSuiteCnt == expectedSuccessfulSuiteCnt)
+      val expectedPassedSuiteCnt = suites.count(_.isFailed.unary_!)
+      assert(impl.passedSuiteCnt == expectedPassedSuiteCnt)
 
       val expectedFailedSuiteCnt = suites.count(_.isFailed)
       assert(impl.failedSuiteCnt == expectedFailedSuiteCnt)
+
+      val suitesReport = impl.suitesReport.replaceAll(fansi.Str.ansiRegex.pattern(), "")
+      assert(
+        suitesReport contains passedStr(expectedPassedSuiteCnt),
+        suitesReport contains failedStr(expectedFailedSuiteCnt)
+      )
+
+      val testsReport = impl.testsReport.replaceAll(fansi.Str.ansiRegex.pattern(), "")
+      assert(
+        testsReport contains passedStr(expectedPassedTestCnt),
+        testsReport contains failedStr(expectedFailedTestCnt)
+      )
+
+      impl.report
     }
     'state {
       impl.passedSuiteCnt
-      intercept[IllegalStateException]{
+      intercept[IllegalStateException] {
         impl.incrementFailedTest()
       }
     }
   }
+
+  private def passedStr(n: Int): String = if (n > 0) s"$n passed" else ""
+  private def failedStr(n: Int): String = if (n > 0) s"$n failed" else ""
 
   private class MockTestSuiteCnt {
     val successfulTestCnt: Int = Random.nextInt(30)
