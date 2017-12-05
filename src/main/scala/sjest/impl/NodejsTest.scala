@@ -28,7 +28,7 @@ private class NodejsTestImpl(jestOutputParser: JestOutputParser,
       this.resolveChildProcess(childProcess, loggers)
     } catch {
       case NonFatal(t) =>
-        loggers.error(s"Test failed with ${fansi.Color.Red(t.toString)}")
+        loggers.error(s"Test failed: ${fansi.Color.Red(t.toString)}")
         JestTestEvent(Status.Failure)
     }
 
@@ -37,7 +37,7 @@ private class NodejsTestImpl(jestOutputParser: JestOutputParser,
     event.copy(duration = duration)
   }
 
-  @SideEffect(this.testStatistics)
+  @SideEffect(testStatistics)
   private def resolveChildProcess(childProcess: ChildProcessOpt,
                                   loggers: Array[Logger])
                                  (implicit taskDef: TaskDef, config: TestFrameworkConfig): JestTestEvent = {
@@ -51,8 +51,14 @@ private class NodejsTestImpl(jestOutputParser: JestOutputParser,
         output.map(config.jestOutputFilter).foreach(loggers.error)
         (Status.Failure, output)
     }
-    outputOpt.foreach(output => jestOutputParser.extractStatistics(output, testStatistics))
+    outputOpt.foreach(this.countTestResult)
     JestTestEvent(status)
   }
 
+  @SideEffect(testStatistics)
+  private def countTestResult(jestOutput: String): Unit = {
+    val result = jestOutputParser.extractStatistics(jestOutput)
+    testStatistics.incrementSuccessTest(result.passed)
+    testStatistics.incrementFailureTest(result.failed)
+  }
 }

@@ -6,8 +6,8 @@ import scala.collection.mutable.ArrayBuffer
 
 @Stateful
 private sealed trait TestStatistics {
-  def incrementSuccessTest(): Unit
-  def incrementFailureTest(): Unit
+  def incrementSuccessTest(n: Int = 1): Unit
+  def incrementFailureTest(n: Int = 1): Unit
   def nextTestSuite(): Unit
 
   def totalTestCnt: Int
@@ -31,13 +31,13 @@ private final class TestStatisticsImpl extends TestStatistics {
   private val suites: ArrayBuffer[(Int, Int)] = ArrayBuffer.empty
   private var deposited: Boolean = false
 
-  override def incrementSuccessTest(): Unit = {
+  override def incrementSuccessTest(n: Int): Unit = {
     checkIfDeposited()
-    successCount += 1
+    successCount += n
   }
-  override def incrementFailureTest(): Unit = {
+  override def incrementFailureTest(n: Int): Unit = {
     checkIfDeposited()
-    failureCount += 1
+    failureCount += n
   }
   override def nextTestSuite(): Unit = {
     checkIfDeposited()

@@ -14,7 +14,7 @@ private[sjest] final class Stateful extends Annotation
 private[sjest] final class Stateless extends Annotation
 
 @Documented
-final class ThreadSafe extends Annotation
+private[sjest] final class ThreadSafe extends Annotation
 
 @Documented
 private[sjest] final class VisibleForTest extends Annotation
