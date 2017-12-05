@@ -1,6 +1,6 @@
 package sjest.impl
 
-import org.scalajs.testinterface.TestUtils
+import io.scalajs.nodejs.fs.Fs
 import sbt.testing._
 import sjest.support.VisibleForTest
 import sjest.{JestSuite, TestFrameworkConfig}
@@ -30,6 +30,8 @@ private class JestTask(override val taskDef: TaskDef,
 
   @VisibleForTest
   private[sjest] def executeImpl(loggers: Array[Logger]): Event = {
+    validateConfig()
+
     implicit val _taskDef: TaskDef = taskDef
 
     val suite = this.loadJestSuite
@@ -37,8 +39,9 @@ private class JestTask(override val taskDef: TaskDef,
     val jsTestCase = suite.getTestCase(taskDef)
     val jsTestPath = jsTestConverter.generateJsTest(jsTestCase)
 
-    val event = if (config.autoRunTestInSbt)
+    val event = if (config.autoRunTestInSbt) {
       nodejsTest.runTest(jsTestPath, loggers)
+    }
     else {
       loggers.foreach(_.info("*.test.js files are generated," +
         " manually run the tests because auto run has been disabled"))
@@ -47,10 +50,11 @@ private class JestTask(override val taskDef: TaskDef,
     event
   }
 
+  @throws[IllegalArgumentException]("when suite load fails.")
   private def loadJestSuite: JestSuite = {
     val fqcn = taskDef.fullyQualifiedName()
     Try {
-      Reflect.lookupInstantiatableClass(fqcn) match{
+      Reflect.lookupInstantiatableClass(fqcn) match {
         case Some(clazz) => clazz.newInstance().asInstanceOf[JestSuite]
         case None => throw new ClassNotFoundException(fqcn)
       }
@@ -59,5 +63,10 @@ private class JestTask(override val taskDef: TaskDef,
       case Failure(t) =>
         throw new IllegalArgumentException(s"Cannot load suite for name: $fqcn", t)
     }
+  }
+
+  @throws[IllegalArgumentException]
+  private def validateConfig(): Unit = {
+    require(Fs.existsSync(config.optJsPath), s"Cannot find ${config.optJsPath}")
   }
 }
