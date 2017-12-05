@@ -26,9 +26,22 @@ _See scala.js doc for file path conventions._
 Dependency:
 
     libraryDependencies += "com.github.cuzfrog" %%% "simple-jest" % "0.0.1-SNAPSHOT" Test
+
+Provide test Framework(to specify client build info):
+    
+    private final class MyTestFramework extends JestFramework {
+      private val project = "tests"
+      //where the *opt.js file is:
+      override protected def optJsPath = s"$project/target/scala-2.12/simple-jest-tests-test-fastopt.js"
+      //where to put generated *.test.js files:
+      override protected def testJsDir = s"$project/target/simple-jests/"
+    }
     
 ### How to use:
 
 ### Misc
 
-This project depends on [Nodejs binding](https://github.com/scalajs-io/nodejs).
+* This project depends on [Nodejs binding](https://github.com/scalajs-io/nodejs).
+
+* Use [Macwire](https://github.com/adamw/macwire) to manage dependency injection
+ as well as parameters passed down to `Task` from `Framework`

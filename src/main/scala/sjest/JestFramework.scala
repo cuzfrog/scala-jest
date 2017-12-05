@@ -15,7 +15,7 @@ abstract class JestFramework extends sbt.testing.Framework {
   override final def runner(args: Array[String],
                             remoteArgs: Array[String],
                             testClassLoader: ClassLoader): Runner = {
-    Module.init(args, remoteArgs, testClassLoader).injectRunner
+    Module.init(args, remoteArgs).injectRunner
   }
 
   override final def slaveRunner(args: Array[String],

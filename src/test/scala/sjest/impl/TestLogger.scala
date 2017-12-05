@@ -31,4 +31,10 @@ private final class TestLogger extends Logger {
     buffer.foreach(println)
     buffer.clear()
   }
+
+  def getAndEmptyContent: Seq[String] = buffer.synchronized {
+    val content = buffer.clone()
+    buffer.clear()
+    content
+  }
 }

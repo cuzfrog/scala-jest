@@ -5,8 +5,10 @@ import sbt.testing._
 import sjest.support.VisibleForTest
 import sjest.{JestSuite, TestFrameworkConfig}
 
+import scala.scalajs.reflect.Reflect
+import scala.util.{Failure, Success, Try}
+
 private class JestTask(override val taskDef: TaskDef,
-                       testClassLoader: ClassLoader,
                        jsTestConverter: JsTestConverter,
                        nodejsTest: NodejsTest)
                       (implicit config: TestFrameworkConfig) extends sbt.testing.Task {
@@ -30,8 +32,7 @@ private class JestTask(override val taskDef: TaskDef,
   private[sjest] def executeImpl(loggers: Array[Logger]): Event = {
     implicit val _taskDef: TaskDef = taskDef
 
-    val suite = TestUtils.newInstance(taskDef.fullyQualifiedName(),
-      testClassLoader, Seq.empty)(Seq.empty).asInstanceOf[JestSuite]
+    val suite = this.loadJestSuite
 
     val jsTestCase = suite.getTestCase(taskDef)
     val jsTestPath = jsTestConverter.generateJsTest(jsTestCase)
@@ -44,5 +45,19 @@ private class JestTask(override val taskDef: TaskDef,
       JestTestEvent(Status.Ignored)
     }
     event
+  }
+
+  private def loadJestSuite: JestSuite = {
+    val fqcn = taskDef.fullyQualifiedName()
+    Try {
+      Reflect.lookupInstantiatableClass(fqcn) match{
+        case Some(clazz) => clazz.newInstance().asInstanceOf[JestSuite]
+        case None => throw new ClassNotFoundException(fqcn)
+      }
+    } match {
+      case Success(suite) => suite
+      case Failure(t) =>
+        throw new IllegalArgumentException(s"Cannot load suite for name: $fqcn", t)
+    }
   }
 }

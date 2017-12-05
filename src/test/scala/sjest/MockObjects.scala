@@ -11,13 +11,15 @@ private object MockObjects {
     testJsDir = "target/tmp/jests/"
   )
 
-  def newTaskDef(fqcn: String): TaskDef =
+  def newTaskDef(fqcn: String = "sjest.MockSuccessTest"): TaskDef =
     new TaskDef(
       _fullyQualifiedName = fqcn,
       _fingerprint = new JestFingerprint,
       _explicitlySpecified = false,
       _selectors = Array(new SuiteSelector)
     )
+
+  val mockSuccessTestFqcn: String = classOf[MockSuccessTest].getName
 }
 
 private final class MockSuccessTest extends JestSuite {

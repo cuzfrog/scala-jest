@@ -16,12 +16,11 @@ private[sjest] object Module {
   }
 
   def init(args: Array[String],
-           remoteArgs: Array[String],
-           testClassLoader: ClassLoader)
+           remoteArgs: Array[String])
           (implicit config: TestFrameworkConfig): this.type = {
     if (moduleRef.get() != null)
       throw new IllegalStateException("DI module can only be initiated once.")
-    moduleRef.set(new ImplementationModule(args, remoteArgs, testClassLoader))
+    moduleRef.set(new ImplementationModule(args, remoteArgs))
     this
   }
 
@@ -31,10 +30,9 @@ private[sjest] object Module {
 }
 
 private class ImplementationModule(args: Array[String],
-                                   remoteArgs: Array[String],
-                                   testClassLoader: ClassLoader)
+                                   remoteArgs: Array[String])
                                   (implicit config: TestFrameworkConfig) {
-  type TaskFactory = TaskDef => sbt.testing.Task
+  type TaskFactory = TaskDef => JestTask
 
   private def jestRunnerArgs: JestRunner.Args = new JestRunner.Args(args)
   private def jestRunnerRemoteArgs: JestRunner.RemoteArgs = new impl.JestRunner.RemoteArgs(args)
