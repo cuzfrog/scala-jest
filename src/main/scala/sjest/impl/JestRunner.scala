@@ -13,10 +13,7 @@ private class JestRunner(_args: Args,
 
   override def tasks(taskDefs: Array[TaskDef]): Array[Task] = taskDefs.map(taskFactory)
 
-  override def done(): String = {
-    testStatistics.suitesReport + NEWLINE +
-      testStatistics.testsReport + NEWLINE
-  }
+  override def done(): String = testStatistics.report
 
   override def receiveMessage(msg: String): Option[String] = {
     //no message sent back to slave

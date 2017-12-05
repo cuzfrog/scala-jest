@@ -2,7 +2,7 @@ package sjest.impl
 
 import sbt.testing.{Event, Logger, Status, TaskDef}
 import sjest.nodejs.{ChildProcess, ChildProcessOpt}
-import sjest.support.SideEffect
+import sjest.support.{SideEffect, VisibleForTest}
 import sjest.{JestFramework, TestFrameworkConfig}
 
 import scala.concurrent.duration.Deadline
@@ -13,7 +13,7 @@ private sealed trait NodejsTest {
 }
 
 private class NodejsTestImpl(jestOutputParser: JestOutputParser,
-                             testStatistics: TestStatistics)
+                             val testStatistics: TestStatistics)
                             (implicit config: TestFrameworkConfig) extends NodejsTest {
 
   @SideEffect(this.testStatistics)
@@ -51,14 +51,13 @@ private class NodejsTestImpl(jestOutputParser: JestOutputParser,
         output.map(config.jestOutputFilter).foreach(loggers.error)
         (Status.Failure, output)
     }
-    outputOpt.foreach(this.countTestResult)
+    outputOpt.foreach(this.jestOutputParser andThen this.countTestResult)
     JestTestEvent(status)
   }
 
   @SideEffect(testStatistics)
-  private def countTestResult(jestOutput: String): Unit = {
-    val result = jestOutputParser.extractStatistics(jestOutput)
-    testStatistics.incrementPassedTest(result.passed)
-    testStatistics.incrementFailedTest(result.failed)
+  private def countTestResult(testCaseResult: TestCaseResult): Unit = {
+    testStatistics.incrementPassedTest(testCaseResult.passed)
+    testStatistics.incrementFailedTest(testCaseResult.failed)
   }
 }

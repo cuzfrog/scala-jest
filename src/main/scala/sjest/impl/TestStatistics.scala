@@ -1,9 +1,10 @@
 package sjest.impl
 
-import sjest.support.Stateful
+import sjest.support.{Service, Stateful}
 
 import scala.collection.mutable.ArrayBuffer
 
+@Service
 @Stateful
 private sealed trait TestStatistics {
   def incrementPassedTest(n: Int = 1): Unit

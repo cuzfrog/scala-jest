@@ -8,12 +8,16 @@ private case class TestCaseResult(failed: Int, passed: Int) {
 }
 
 @Stateless
-private sealed trait JestOutputParser {
+private sealed trait JestOutputParser extends Function1[String, TestCaseResult] {
   /**
    * Extract test statistics info and update the TestStatistics
    */
   @throws[IllegalArgumentException]
   def extractStatistics(jestOutput: String): TestCaseResult
+
+  @deprecated("Do not use apply, use extractStatistics explicitly", "intentional")
+  @throws[IllegalArgumentException]
+  def apply(jestOutput: String): TestCaseResult = extractStatistics(jestOutput)
 }
 
 private final class JestOutputParserImpl extends JestOutputParser {

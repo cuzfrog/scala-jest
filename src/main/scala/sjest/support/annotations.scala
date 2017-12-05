@@ -18,3 +18,6 @@ private[sjest] final class ThreadSafe extends Annotation
 
 @Documented
 private[sjest] final class VisibleForTest extends Annotation
+
+@Documented
+private[sjest] final class Service extends Annotation
