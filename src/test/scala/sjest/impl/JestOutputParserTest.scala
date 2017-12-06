@@ -9,17 +9,17 @@ object JestOutputParserTest extends TestSuite {
   val tests = Tests {
     "positive1-passed" - {
       val mockOutput =
-        """ PASS  tests/target/simple-jests/anywhere.Test2.test.js
+        """ PASS  tests/target/sjests/anywhere.Test2.test.js
           |  ✓ this is my second test (19ms)
           |
-          |  console.log tests/target/scala-2.12/simple-jest-tests-test-fastopt.js:30557
+          |  console.log tests/target/scala-2.12/sjest-tests-test-fastopt.js:30557
           |    do some test2!
           |
           |Test Suites: 1 passed, 1 total
           |Tests:       3 passed, 3 total
           |Snapshots:   0 total
           |Time:        0.645s, estimated 1s
-          |Ran all test suites matching /tests\/target\/simple-jests\/anywhere.Test2.test.js/i.
+          |Ran all test suites matching /tests\/target\/sjests\/anywhere.Test2.test.js/i.
           |""".stripMargin
 
       val result = impl.extractStatistics(mockOutput)

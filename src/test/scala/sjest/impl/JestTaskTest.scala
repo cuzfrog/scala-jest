@@ -13,7 +13,7 @@ object JestTaskTest extends TestSuite {
   import MockObjects.mockSuccessTestFqcn
 
   private val config = MockObjects.mockConfig
-    .copy(optJsPath = "target/scala-2.12/simple-jest-test-fastopt.js")
+    .copy(optJsPath = "target/scala-2.12/sjest-test-fastopt.js")
 
   val tests = Tests {
     val logger = new TestLogger

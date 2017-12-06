@@ -17,7 +17,8 @@ private object JsTestStub {
     testSuite.jsTestCase.getTests
       .collectFirst { case (desc, cb) if desc == keyDescription => cb } match {
       case Some(codeBlock) => codeBlock
-      case None => throw new IllegalArgumentException(s"Cannot find test $keyDescription in $fqcn")
+      case None => throw new IllegalArgumentException(
+        s"Cannot find test '$keyDescription' in '$fqcn', is *opt.js file stale?")
     }
   }
 }

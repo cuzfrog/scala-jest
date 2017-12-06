@@ -8,7 +8,7 @@ import sjest.impl.Module
 import scala.scalajs.js
 
 abstract class JestFramework extends sbt.testing.Framework {
-  override final def name(): String = "simple-jest"
+  override final def name(): String = "scala-jest"
 
   override final def fingerprints(): Array[Fingerprint] = Array(new JestFingerprint)
 
@@ -64,7 +64,7 @@ object JestFramework {
 
   private[sjest] lazy val defaultConfig = TestFrameworkConfig(
     optJsPath = "",
-    testJsDir = "./target/simple-jests/",
+    testJsDir = "./target/scala-jests/",
     nodejsCmdOfPath = (jsTestPath: String) =>
       NodejsCmd("node_modules/jest/bin/jest.js", js.Array("--colors", jsTestPath)),
     autoRunTestInSbt = true,
