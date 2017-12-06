@@ -7,7 +7,9 @@ import scala.collection.mutable.ArrayBuffer
 @Service
 @Stateful
 private sealed trait TestStatistics {
+  @throws[IllegalArgumentException]
   def incrementPassedTest(n: Int = 1): Unit
+  @throws[IllegalArgumentException]
   def incrementFailedTest(n: Int = 1): Unit
   def nextTestSuite(): Unit
 
@@ -21,44 +23,49 @@ private sealed trait TestStatistics {
 
   def isAllPassed: Boolean = totalSuiteCnt == passedSuiteCnt
 
-  def testsReport: String
-  def suitesReport: String
-  def report: String = suitesReport + NEWLINE + testsReport
+  def testsReport(ansi: Boolean = true): String
+  def suitesReport(ansi: Boolean = true): String
+  def report(ansi: Boolean = true): String = suitesReport(ansi) + NEWLINE + testsReport(ansi)
+
+  def getSuites: Seq[TestCaseResult]
+  def addSuites(suites: Seq[TestCaseResult]): this.type
 }
 
 private final class TestStatisticsImpl extends TestStatistics {
 
   private var successCount: Int = 0
   private var failureCount: Int = 0
-  private val suites: ArrayBuffer[(Int, Int)] = ArrayBuffer.empty
+  private val suites: ArrayBuffer[TestCaseResult] = ArrayBuffer.empty
   private var deposited: Boolean = false
 
   override def incrementPassedTest(n: Int): Unit = {
+    require(n > 0)
     checkIfDeposited()
     successCount += n
   }
   override def incrementFailedTest(n: Int): Unit = {
+    require(n > 0)
     checkIfDeposited()
     failureCount += n
   }
   override def nextTestSuite(): Unit = {
     checkIfDeposited()
-    suites += (successCount -> failureCount)
+    suites += TestCaseResult(failureCount, successCount)
     successCount = 0
     failureCount = 0
   }
 
   override lazy val totalTestCnt: Int = {
     deposit()
-    suites.map { case (s, f) => s + f }.reduceOption(_ + _).getOrElse(0)
+    suites.map(_.total).sum
   }
   override lazy val passedTestCnt: Int = {
     deposit()
-    suites.map { case (s, _) => s }.reduceOption(_ + _).getOrElse(0)
+    suites.map(_.passed).sum
   }
   override lazy val failedTestCnt: Int = {
     deposit()
-    suites.map { case (_, f) => f }.reduceOption(_ + _).getOrElse(0)
+    suites.map(_.failed).sum
   }
   override lazy val totalSuiteCnt: Int = {
     deposit()
@@ -66,11 +73,11 @@ private final class TestStatisticsImpl extends TestStatistics {
   }
   override lazy val passedSuiteCnt: Int = {
     deposit()
-    suites.count { case (_, f) => f == 0 }
+    suites.count(_.failed == 0)
   }
   override lazy val failedSuiteCnt: Int = {
     deposit()
-    suites.count { case (_, f) => f > 0 }
+    suites.count(_.passed > 0)
   }
 
   private def deposit(): Unit = {
@@ -81,16 +88,25 @@ private final class TestStatisticsImpl extends TestStatistics {
     if (deposited) throw new IllegalStateException("This TestStatistics has already been deposited.")
   }
 
-  override def testsReport: String = {
+  override def testsReport(ansi: Boolean): String = {
     val total = totalTestCnt + " total"
-    val success = if (passedTestCnt > 0) fansi.Color.Green(passedTestCnt + " passed, ") else ""
-    val failure = if (failedTestCnt > 0) fansi.Color.Red(failedTestCnt + " failed, ") else ""
+    val success = if (passedTestCnt > 0) green(ansi)(passedTestCnt + " passed, ") else ""
+    val failure = if (failedTestCnt > 0) red(ansi)(failedTestCnt + " failed, ") else ""
     s"Test       : $failure$success$total"
   }
-  override def suitesReport: String = {
+  override def suitesReport(ansi: Boolean): String = {
     val total = totalSuiteCnt + " total"
-    val success = if (passedSuiteCnt > 0) fansi.Color.Green(passedSuiteCnt + " passed, ") else ""
-    val failure = if (failedSuiteCnt > 0) fansi.Color.Red(failedSuiteCnt + " failed, ") else ""
+    val success = if (passedSuiteCnt > 0) green(ansi)(passedSuiteCnt + " passed, ") else ""
+    val failure = if (failedSuiteCnt > 0) red(ansi)(failedSuiteCnt + " failed, ") else ""
     s"Test Suites: $failure$success$total"
+  }
+  private def red(ansi: Boolean)(in: String) = if (ansi) fansi.Color.Red(in) else in
+  private def green(ansi: Boolean)(in: String) = if (ansi) fansi.Color.Green(in) else in
+
+  override def getSuites: Seq[TestCaseResult] = this.suites.clone()
+  override def addSuites(suites: Seq[TestCaseResult]): this.type = {
+    checkIfDeposited()
+    this.suites ++= suites
+    this
   }
 }

@@ -22,7 +22,8 @@ abstract class JestFramework extends sbt.testing.Framework {
                                  remoteArgs: Array[String],
                                  testClassLoader: ClassLoader,
                                  send: String => Unit): Runner = {
-    this.runner(args, remoteArgs, testClassLoader)
+    Module.init(args, remoteArgs, Some(send)).injectRunner
+    //note: master and slave are in two different applications, thus two Modules
   }
 
   private implicit final def assembleConfig: TestFrameworkConfig = {
@@ -37,6 +38,7 @@ abstract class JestFramework extends sbt.testing.Framework {
 
   //------------------ client custom api -------------------
   import JestFramework.defaultConfig
+
   /** *opt.js full path or path relative to sbt root dir. */
   protected def optJsPath: String
   /** Generated *.test.js full path or path relative to sbt root dir. */

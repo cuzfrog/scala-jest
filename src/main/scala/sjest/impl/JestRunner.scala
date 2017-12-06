@@ -13,9 +13,10 @@ private class JestRunner(_args: Args,
 
   override def tasks(taskDefs: Array[TaskDef]): Array[Task] = taskDefs.map(taskFactory)
 
-  override def done(): String = testStatistics.report
+  override def done(): String = testStatistics.report()
 
   override def receiveMessage(msg: String): Option[String] = {
+    //testStatistics.assimilateFromReport(msg)
     //no message sent back to slave
     None
   }
@@ -31,4 +32,16 @@ private class JestRunner(_args: Args,
 private object JestRunner {
   class Args(val args: Array[String]) extends AnyVal
   class RemoteArgs(val args: Array[String]) extends AnyVal
+}
+
+private class JestSlaveRunner(_args: Args,
+                              _remoteArgs: RemoteArgs,
+                              taskFactory: TaskDef => Task,
+                              testStatistics: TestStatistics,
+                              communicationTunnel: String => Unit)
+  extends JestRunner(_args, _remoteArgs, taskFactory, testStatistics) {
+  override def done(): String = {
+    //communicationTunnel(testStatistics)
+    ""
+  }
 }

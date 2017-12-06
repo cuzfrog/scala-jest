@@ -7,6 +7,10 @@ import sbt.testing.TaskDef
 import sjest.support.VisibleForTest
 import sjest.{TestFrameworkConfig, impl}
 
+/**
+ * One module per application.
+ * Note: master and slave are in two different applications, thus two Modules
+ */
 private[sjest] object Module {
   private val moduleRef: AtomicReference[ImplementationModule] = new AtomicReference
   @VisibleForTest
@@ -18,35 +22,44 @@ private[sjest] object Module {
   }
 
   def init(args: Array[String] = Array.empty,
-           remoteArgs: Array[String] = Array.empty)
+           remoteArgs: Array[String] = Array.empty,
+           communicationTunnel: Option[String => Unit] = None)
           (implicit config: TestFrameworkConfig): this.type = {
     if (moduleRef.get() != null)
       throw new IllegalStateException("DI module can only be initiated once.")
-    moduleRef.set(new ImplementationModule(args, remoteArgs))
+    moduleRef.compareAndSet(null, new ImplementationModule(args, remoteArgs, communicationTunnel))
     this
   }
 
-  def injectRunner: sbt.testing.Runner = getModule.injectRunner
+  def injectRunner: sbt.testing.Runner = getModule.jestRunner
 
   val defaultJestOutputFilter: String => String = JestOutputFilter.instance
 }
 
 private class ImplementationModule(args: Array[String],
-                                   remoteArgs: Array[String])
+                                   remoteArgs: Array[String],
+                                   communicationTunnel: Option[String => Unit])
                                   (implicit config: TestFrameworkConfig) {
-  type TaskFactory = TaskDef => JestTask
+  final type TaskFactory = TaskDef => JestTask
+  final type CommunicationTunnel = String => Unit
 
   private def jestRunnerArgs: JestRunner.Args = new JestRunner.Args(args)
   private def jestRunnerRemoteArgs: JestRunner.RemoteArgs = new impl.JestRunner.RemoteArgs(args)
+  final def isSlave: Boolean = communicationTunnel.isDefined
 
   // ------ Singletons ------
-  @VisibleForTest lazy val testStatistics: TestStatistics = wire[TestStatisticsImpl]
-  protected lazy val taskFactory: TaskFactory = (taskDef: TaskDef) => wire[JestTask]
+  @VisibleForTest lazy final val testStatistics: TestStatistics = wire[TestStatisticsImpl]
+  protected lazy final val taskFactory: TaskFactory = (taskDef: TaskDef) => wire[JestTask]
 
   // ------ Prototypes ------
-  protected def jestOutputParser: JestOutputParser = wire[JestOutputParserImpl]
-  protected def jsTestConverter: JsTestConverter = wire[JsTestConverterImpl]
-  @VisibleForTest def nodejsTest: NodejsTest = wire[NodejsTestImpl]
+  protected final def jestOutputParser: JestOutputParser = wire[JestOutputParserImpl]
+  protected final def jsTestConverter: JsTestConverter = wire[JsTestConverterImpl]
+  @VisibleForTest final def nodejsTest: NodejsTest = wire[NodejsTestImpl]
 
-  def injectRunner: sbt.testing.Runner = wire[JestRunner]
+  final def jestRunner: JestRunner = {
+    if (isSlave) {
+      val send = communicationTunnel.get
+      wire[JestSlaveRunner]
+    } else wire[JestRunner]
+  }
 }

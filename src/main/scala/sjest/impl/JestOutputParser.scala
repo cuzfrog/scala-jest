@@ -32,13 +32,13 @@ private final class JestOutputParserImpl extends JestOutputParser {
 
 private object JestOutputParserImpl {
   private final val ansiRegex = fansi.Str.ansiRegex.pattern()
-  private final val ResultExtractor = """Tests:( \d+ failed,)?( \d+ passed,)? \d+ total""".r
+  private final val ResultExtractor = """Tests:(\d+failed,)?(\d+passed,)?\d+total""".r
 
   private def extractLines(jestOutput: String): Seq[String] = {
     val plainOutput = jestOutput.replaceAll(ansiRegex, "")
     val qualifiedLines = plainOutput.split(raw"""$NEWLINE""").toSeq
     val lines = qualifiedLines.collect {
-      case line if line.startsWith("Tests:") => line.replaceAll("""\s\s+""", " ")
+      case line if line.startsWith("Tests:") => line.replaceAll("""\s""", "")
     }
     require(lines.lengthCompare(0) > 0,
       s"Cannot extract test result from jest output:$NEWLINE$jestOutput")
