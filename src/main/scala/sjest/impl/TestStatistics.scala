@@ -38,6 +38,9 @@ private final class TestStatisticsImpl extends TestStatistics {
   private val suites: ArrayBuffer[TestCaseResult] = ArrayBuffer.empty
   private var deposited: Boolean = false
 
+  override def toString: String =
+    s"TestStatistics{${suitesReport(false)}; ${testsReport(false)}}".replaceAll("""\s""", "")
+
   override def incrementPassedTest(n: Int): Unit = {
     require(n > 0)
     checkIfDeposited()
@@ -77,7 +80,7 @@ private final class TestStatisticsImpl extends TestStatistics {
   }
   override lazy val failedSuiteCnt: Int = {
     deposit()
-    suites.count(_.passed > 0)
+    suites.count(_.failed > 0)
   }
 
   private def deposit(): Unit = {

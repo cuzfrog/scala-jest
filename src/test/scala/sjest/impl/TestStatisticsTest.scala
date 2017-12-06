@@ -1,10 +1,11 @@
 package sjest.impl
 
+import sjest.PropertyTest
 import utest._
 
 import scala.util.Random
 
-object TestStatisticsTest extends TestSuite {
+object TestStatisticsTest extends TestSuite with PropertyTest {
 
   val tests = Tests {
     val impl = ModuleForTest().Prototype.testStatistics
