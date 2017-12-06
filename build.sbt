@@ -19,7 +19,7 @@ val root = (project in file("."))
       "com.lihaoyi" %%% "fansi" % "0.2.5",
       "com.lihaoyi" %%% "utest" % "0.6.0" % Test
     ),
-    testFrameworks += new TestFramework("utest.runner.Framework")
+    testFrameworks += new TestFramework("sjest.MyUTestFramework")
   )
 
 val tests = project.dependsOn(root)
