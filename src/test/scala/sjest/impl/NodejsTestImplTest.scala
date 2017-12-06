@@ -10,10 +10,11 @@ import scala.util.Random
 
 object NodejsTestImplTest extends TestSuite {
 
-
   private implicit val mockConfig: TestFrameworkConfig = MockObjects.mockConfig
   private implicit val taskDef: TaskDef = MockObjects.newTaskDef("test-taskDef")
   private val module = ModuleForTest()
+
+  override def utestAfterAll(): Unit = FSUtils.delete(mockConfig.testJsDir)
 
   val tests = Tests {
     val logger = new TestLogger

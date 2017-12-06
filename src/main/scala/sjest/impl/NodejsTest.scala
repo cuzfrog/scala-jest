@@ -6,6 +6,7 @@ import sjest.support.SideEffect
 import sjest.{JestFramework, TestFrameworkConfig}
 
 import scala.concurrent.duration.Deadline
+import scala.scalajs.js
 import scala.util.control.NonFatal
 
 private sealed trait NodejsTest {

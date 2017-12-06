@@ -8,16 +8,9 @@ Write `jest` tests as scala classes and run them within sbt without any hassle.
 
 ![scala-jest-demo.png](demo-pic/scala-jest-demo.png)
 
-### How it works?
-Scala-jest exposes client tests in `*opt.js`, and generates `*.test.js` files to call them,
-executed by nodejs' `child_process`, which then triggers [jest](https://facebook.github.io/jest).
-So scala.js is not involved the when testing is running, only the stdout/err shown in sbt console.
-
-A drawback is that file paths are not managed by sbt, and must be set manually.
-
 ### Setup
 
-Prerequisite:
+Prerequisites:
 
 * nodejs (probably higher than v8.7.0) 
 * a `package.json`, or `npm init` to make one
@@ -40,7 +33,11 @@ private final class MyTestFramework extends JestFramework {
   //where to put generated *.test.js files:
   override protected def testJsDir = s"$project/target/sjests/"
 }
-```  
+```
+
+Add test framework to sbt:
+
+    testFrameworks += new TestFramework("your.package.MyTestFramework")
 
 ### It's simple to use:
 
@@ -71,12 +68,32 @@ final class Test1 extends sjest.JestSuite {
 
 You are good to go!
 
-### Misc
+### More config:
 
-* This project depends on [Nodejs binding](https://github.com/scalajs-io/nodejs).
+See more configs in [JestFramework](src/main/scala/sjest/JestFramework.scala)
+```scala
+abstract class JestFramework{
+  /** Yield test command, given a test.js file path. Jest configs can be put here. */
+  protected def nodejsCmd(jsTestPath: String): NodejsCmd = (jsTestPath: String) =>
+     NodejsCmd("node_modules/jest/bin/jest.js", js.Array("--colors", "--bail", jsTestPath))
+  
+  /** Whether to run actual test by `'sbt test'`. <br>
+   * 'jest xx.test.js' is executed for every test, thus worse performance.
+   * One could disable it by set this to false, and manually run jest from command line.
+   */
+  protected def autoRunTestInSbt: Boolean
+  
+  /** Filter jest output in sbt console */
+  protected def jestOutputFilter: String => String
+}
+```
 
-* Use [Macwire](https://github.com/adamw/macwire) to manage dependency injection
- as well as parameters passed down to `Task` from `Framework`
+### How it works?
+Scala-jest exposes client tests in `*opt.js`, and generates `*.test.js` files to call them,
+executed by nodejs' `child_process`, which then triggers [jest](https://facebook.github.io/jest).
+So scala.js is not involved the when testing is running, only the stdout/err shown in sbt console.
+
+A drawback is that file paths are not managed by sbt, and must be set manually.
  
 ### About
  

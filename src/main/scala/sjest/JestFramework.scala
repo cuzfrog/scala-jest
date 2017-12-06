@@ -41,14 +41,15 @@ abstract class JestFramework extends sbt.testing.Framework {
 
   /** *opt.js full path or path relative to sbt root dir. */
   protected def optJsPath: String
+
   /** Generated *.test.js full path or path relative to sbt root dir. */
   protected def testJsDir: String = defaultConfig.testJsDir
-  /** Yield npm test command, given a test.js file path.<br>
-   * /dev/null is used to suppress jest output in sbt console.
-   */
+
+  /** Yield test command, given a test.js file path.  Jest configs can be put here. */
   protected def nodejsCmd(jsTestPath: String): NodejsCmd = defaultConfig.nodejsCmdOfPath(jsTestPath)
-  /** Whether to run npm test in sbt. <br>
-   * 'npm test -- xx.test.js' is executed for every test, thus worse performance.
+
+  /** Whether to run actual test by `'sbt test'`. <br>
+   * 'jest xx.test.js' is executed for every test, thus worse performance.
    * One could disable it by set this to false, and manually run jest from command line.
    */
   protected def autoRunTestInSbt: Boolean = defaultConfig.autoRunTestInSbt

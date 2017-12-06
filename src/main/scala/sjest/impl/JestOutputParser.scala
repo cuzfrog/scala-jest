@@ -28,8 +28,6 @@ private final class JestOutputParserImpl extends JestOutputParser {
 
 private object JestOutputParserImpl {
   private final val ansiRegex = fansi.Str.ansiRegex.pattern()
-  private final val ResultExtractor = """Tests:(\d+failed,)?(\d+passed,)?\d+total""".r
-
   private def extractLines(jestOutput: String): Seq[String] = {
     val plainOutput = jestOutput.replaceAll(ansiRegex, "")
     val qualifiedLines = plainOutput.split(raw"""$NEWLINE""").toSeq
@@ -41,10 +39,11 @@ private object JestOutputParserImpl {
     lines
   }
 
+  private final val ResultExtractor = """Tests:(\d+failed,)?(\d+passed,)?(\d+of)?\d+total""".r
   //contract: lines.size>0
   private def extractTestResult(lines: Seq[String]): TestCaseResult = {
     val resultOpt = lines.collectFirst {
-      case ResultExtractor(failedStr, passedStr) =>
+      case ResultExtractor(failedStr, passedStr, _) =>
         val failed = extractNum(failedStr)
         val passed = extractNum(passedStr)
         TestCaseResult(failed, passed)

@@ -36,10 +36,10 @@ object JestOutputParserTest extends TestSuite {
       val expected = TestCaseResult(15, 1)
       assert(result == expected)
     }
-    "positive3-failed" - {
+    "positive-failed" - {
       val mockOutput =
-        """Test Suites: 1 failed, 1 total
-          |Tests:       15 failed, 2 total
+        """Test Suites: 1 failed, 1 of 2 total
+          |Tests:       15 failed, 15 of 23 total
           |""".stripMargin
       val result = impl.extractStatistics(mockOutput)
       val expected = TestCaseResult(15, 0)
