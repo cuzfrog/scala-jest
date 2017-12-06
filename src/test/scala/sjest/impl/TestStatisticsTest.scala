@@ -75,8 +75,8 @@ object TestStatisticsTest extends TestSuite with PropertyTest {
     val totalCnt: Int = passedTestCnt + failedTestCnt
 
     def test(testStatistics: TestStatistics): Unit = {
-      if (passedTestCnt > 0) testStatistics.incrementPassedTest(passedTestCnt)
-      if (failedTestCnt > 0) testStatistics.incrementFailedTest(failedTestCnt)
+      testStatistics.incrementPassedTest(passedTestCnt)
+      testStatistics.incrementFailedTest(failedTestCnt)
     }
 
     def isFailed: Boolean = failedTestCnt > 0

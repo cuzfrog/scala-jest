@@ -3,10 +3,6 @@ package sjest.impl
 import com.sun.istack.internal.Nullable
 import sjest.support.Stateless
 
-private case class TestCaseResult(failed: Int, passed: Int) {
-  def total: Int = failed + passed
-}
-
 @Stateless
 private sealed trait JestOutputParser extends Function1[String, TestCaseResult] {
   /**
@@ -57,7 +53,7 @@ private object JestOutputParserImpl {
       ("Cannot parse test result from jest output:" +: lines).mkString(NEWLINE)))
   }
 
-  private final val NumberExtractor = """(\d+) [a-zA-Z]+,""".r
+  private final val NumberExtractor = """(\d+)[a-zA-Z]+,""".r
   private def extractNum(@Nullable expr: String): Int = {
     if (expr == null) 0
     else expr.trim match {

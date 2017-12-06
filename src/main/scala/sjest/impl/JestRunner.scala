@@ -3,6 +3,8 @@ package sjest.impl
 import sbt.testing.{Task, TaskDef}
 import sjest.impl.JestRunner.{Args, RemoteArgs}
 
+import scala.scalajs.js
+
 private class JestRunner(_args: Args,
                          _remoteArgs: RemoteArgs,
                          taskFactory: TaskDef => Task,
@@ -16,7 +18,8 @@ private class JestRunner(_args: Args,
   override def done(): String = testStatistics.report()
 
   override def receiveMessage(msg: String): Option[String] = {
-    //testStatistics.assimilateFromReport(msg)
+    val suites = js.JSON.parse(msg).asInstanceOf[js.Array[String]].map(TestCaseResult.fromJson)
+    testStatistics.addSuites(suites)
     //no message sent back to slave
     None
   }
@@ -41,7 +44,9 @@ private class JestSlaveRunner(_args: Args,
                               communicationTunnel: String => Unit)
   extends JestRunner(_args, _remoteArgs, taskFactory, testStatistics) {
   override def done(): String = {
-    //communicationTunnel(testStatistics)
+    import scalajs.js.JSConverters._
+    val suites = testStatistics.getSuites.map(_.toJson).toJSArray
+    communicationTunnel(js.JSON.stringify(suites))
     ""
   }
 }

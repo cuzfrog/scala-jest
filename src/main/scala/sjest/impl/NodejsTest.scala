@@ -25,15 +25,17 @@ private class NodejsTestImpl(jestOutputParser: JestOutputParser,
       val JestFramework.NodejsCmd(cmd, args) = config.nodejsCmdOfPath(jsTestPath)
       val childProcess = ChildProcess.spawnSync(cmd, args) //run code with nodejs
 
-      this.resolveChildProcess(childProcess, loggers)
+      val testEvent = this.resolveChildProcess(childProcess, loggers)
+      testStatistics.nextTestSuite()
+      testEvent
     } catch {
       case NonFatal(t) =>
         loggers.error(s"Test failed: ${fansi.Color.Red(t.toString)}")
+        loggers.error(t.getStackTrace.mkString(NEWLINE))
         JestTestEvent(Status.Failure)
     }
 
     val duration = (Deadline.now - startTime).toMillis
-    testStatistics.nextTestSuite()
     event.copy(duration = duration)
   }
 

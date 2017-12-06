@@ -42,12 +42,12 @@ private final class TestStatisticsImpl extends TestStatistics {
     s"TestStatistics{${suitesReport(false)}; ${testsReport(false)}}".replaceAll("""\s""", "")
 
   override def incrementPassedTest(n: Int): Unit = {
-    require(n > 0)
+    require(n >= 0)
     checkIfDeposited()
     successCount += n
   }
   override def incrementFailedTest(n: Int): Unit = {
-    require(n > 0)
+    require(n >= 0)
     checkIfDeposited()
     failureCount += n
   }
