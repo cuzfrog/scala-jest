@@ -9,7 +9,7 @@ import scala.scalajs.reflect.Reflect
 import scala.util.{Failure, Success, Try}
 
 private class JestTask(override val taskDef: TaskDef,
-                       jsTestConverter: JsTestConverter,
+                       jsTestConverter: JsTestGenerator,
                        nodejsTest: NodejsTest)
                       (implicit config: TestFrameworkConfig) extends sbt.testing.Task {
   override def tags(): Array[String] = Array("jest-test-task")

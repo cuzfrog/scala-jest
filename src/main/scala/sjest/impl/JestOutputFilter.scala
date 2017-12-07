@@ -1,6 +1,7 @@
 package sjest.impl
 
 import sjest.support.Stateless
+import sjest.NEWLINE
 
 @Stateless
 private sealed trait JestOutputFilter extends Function1[String, String] {

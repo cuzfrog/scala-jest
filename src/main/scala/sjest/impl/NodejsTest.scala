@@ -8,6 +8,7 @@ import sjest.{JestFramework, TestFrameworkConfig}
 import scala.concurrent.duration.Deadline
 import scala.scalajs.js
 import scala.util.control.NonFatal
+import sjest.NEWLINE
 
 private sealed trait NodejsTest {
   def runTest(jsTestPath: String, loggers: Array[Logger])(implicit taskDef: TaskDef): Event

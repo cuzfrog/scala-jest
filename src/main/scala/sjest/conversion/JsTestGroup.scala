@@ -5,12 +5,14 @@ import sjest.support.{MutableContext, Stateful, VisibleForTest}
 
 import scala.collection.mutable
 
+import sjest.NEWLINE
+
 @Stateful
 private final class JsTestGroup(val descr: Option[String] = None,
                                 val parent: Option[JsTestGroup] = None) extends JsTestTree {
   self =>
 
-  private[this] val subTrees: mutable.ArrayBuffer[JsTestTree] = mutable.ArrayBuffer.empty
+  private val subTrees: mutable.ArrayBuffer[JsTestTree] = mutable.ArrayBuffer.empty
 
   @VisibleForTest
   def getTests: Seq[JsTestCase] = subTrees.flatMap {
@@ -46,5 +48,33 @@ private final class JsTestGroup(val descr: Option[String] = None,
     if (subTrees.nonEmpty)
       throw new IllegalStateException("setTrees can only be used on fresh JsTestGroup")
     subTrees ++ trees
+  }
+}
+
+private object JsTestGroup {
+  implicit val conversion: JsTestConversion[JsTestGroup, Seq[String] => String] =
+    new JsTestConversion[JsTestGroup, Seq[String] => String] {
+      override def convert(t: JsTestGroup): Seq[String] => String = {
+        recursiveConvertGroup(t, _)
+      }
+    }
+
+  private def recursiveConvertGroup(t: JsTestGroup, upperPath: Seq[String]): String = {
+    val path = upperPath ++ t.descr
+    t.subTrees.map {
+      case group: JsTestGroup =>
+        val inner = recursiveConvertGroup(group, path)
+        wrapDescribe(t.descr, inner)
+      case testCase: JsTestCase => testCase.toJsTest(path)
+    }.mkString(NEWLINE)
+  }
+
+  private def wrapDescribe(descr: Option[String], inner: String): String = {
+    if (descr.nonEmpty) {
+      s"""describe('${descr.get}', () => {
+         |$inner
+         |});"""
+    }
+    else inner
   }
 }

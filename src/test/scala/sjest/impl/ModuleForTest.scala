@@ -20,7 +20,7 @@ case class ModuleForTest(args: Array[String] = Array.empty,
 
   object Prototype {
     def nodejsTestImpl: NodejsTestImpl = wire[NodejsTestImpl]
-    def jsTestConverter: JsTestConverter = module.jsTestConverter
+    def jsTestConverter: JsTestGenerator = module.jsTestConverter
     def jestOutputParser: JestOutputParser = module.jestOutputParser
     def testStatistics: TestStatistics = wire[TestStatisticsImpl]
     def jestTask(fqcn: String): JestTask = module.taskFactory(MockObjects.newTaskDef(fqcn))

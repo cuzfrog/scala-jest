@@ -2,7 +2,7 @@ import Settings._
 
 inThisBuild(Seq(
   shellPrompt := { state => Project.extract(state).currentRef.project + "> " },
-  scalaVersion := "2.12.3",
+  scalaVersion := "2.11.11",
   crossScalaVersions := Seq("2.11.11", "2.12.3"),
   version := "0.1.0-SNAPSHOT"
 ))
