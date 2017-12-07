@@ -1,4 +1,4 @@
-package sjest.impl
+package sjest.conversion
 
 import sjest.MockSuccessTest
 import utest._

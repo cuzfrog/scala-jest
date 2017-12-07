@@ -1,10 +1,10 @@
 package sjest.impl
 
 import io.scalajs.nodejs.path.Path
+import sjest.TestFrameworkConfig
 import sjest.conversion.JsTestContainer
 import sjest.nodejs.FSUtils
 import sjest.support.Stateless
-import sjest.TestFrameworkConfig
 
 @Stateless
 private sealed trait JsTestConverter {

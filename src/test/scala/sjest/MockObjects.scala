@@ -1,7 +1,7 @@
 package sjest
 
 import sbt.testing.{SuiteSelector, TaskDef}
-import sjest.impl.JsTestStubTest
+import sjest.conversion.JsTestStubTest
 
 import scala.scalajs.js
 

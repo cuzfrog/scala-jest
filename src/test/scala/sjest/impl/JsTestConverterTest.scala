@@ -2,9 +2,10 @@ package sjest.impl
 
 import io.scalajs.nodejs.fs.Fs
 import io.scalajs.nodejs.path.Path
-import sjest.{JestSuite, JsTestContainer, MockObjects, PropertyTest}
+import sjest.conversion.JsTestContainer
 import sjest.nodejs.FSUtils
 import sjest.support.MutableContext
+import sjest.{JestSuite, MockObjects, PropertyTest}
 import utest._
 
 import scala.util.Random

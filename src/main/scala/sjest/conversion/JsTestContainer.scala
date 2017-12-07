@@ -27,12 +27,12 @@ private[sjest] final class JsTestContainer {
       .getOrElse(throw new IllegalStateException("Top test describe cannot be escaped"))
   }
 
-  def queryTestCase(path: Seq[String]): JsTestCase = ???
+  private[conversion] def queryTestCase(path: Seq[String]): JsTestCase = ???
 
   @VisibleForTest
-  def getTests: Seq[JsTestCase] = testTree.getTests
+  private[conversion] def getTests: Seq[JsTestCase] = testTree.getTests
 
-  def getTree: JsTestGroup = testTree.clone()
+  private[conversion] def getTree: JsTestGroup = testTree.clone()
 
   def setSuiteName(name: String)(implicit mutableContext: MutableContext[JestSuite]): this.type = {
     require(name.matches("""[\w-_\.]*\$?"""), s"Bad module name: $name")

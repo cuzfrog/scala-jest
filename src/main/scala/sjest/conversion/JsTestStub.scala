@@ -1,4 +1,4 @@
-package sjest.impl
+package sjest.conversion
 
 import sjest.JestSuite
 
@@ -14,16 +14,17 @@ private object JsTestStub {
       case None => throw new ClassNotFoundException(fqcn)
     }
     val descrOpt = descr.toOption
-    val group = testSuite.jsTestContainer.getGroups.find(_.descr == descrOpt) match {
-      case Some(g) => g
-      case None => throw new IllegalArgumentException(
-        s"Cannot find describe group '$descr' in '$fqcn', is *opt.js file stale?")
-    }
-
-    group.getTests.find(_.name == testName) match {
-      case Some(test) => test.runBlock
-      case None => throw new IllegalArgumentException(
-        s"Cannot find test '$testName' in '$fqcn', is *opt.js file stale?")
-    }
+//    val group = testSuite.jsTestContainer.getGroups.find(_.descr == descrOpt) match {
+//      case Some(g) => g
+//      case None => throw new IllegalArgumentException(
+//        s"Cannot find describe group '$descr' in '$fqcn', is *opt.js file stale?")
+//    }
+//
+//    group.getTests.find(_.name == testName) match {
+//      case Some(test) => test.runBlock
+//      case None => throw new IllegalArgumentException(
+//        s"Cannot find test '$testName' in '$fqcn', is *opt.js file stale?")
+//    }
+    ???
   }
 }
