@@ -22,7 +22,7 @@ private[sjest] final class JsTestContainer {
   def escapeDescribe(description: String)
                     (implicit mutableContext: MutableContext[JestSuite]): Unit = {
     if (!cursor.descr.contains(description))
-      throw new IllegalStateException(s"Current describ is not '$description'")
+      throw new IllegalStateException(s"Current describe is not '$description'")
     cursor = cursor.parent
       .getOrElse(throw new IllegalStateException("Top test describe cannot be escaped"))
   }
