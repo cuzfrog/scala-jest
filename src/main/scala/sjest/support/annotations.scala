@@ -21,3 +21,6 @@ private[sjest] final class VisibleForTest extends Annotation
 
 @Documented
 private[sjest] final class Service extends Annotation
+
+@Documented
+private[sjest] final class InternalControl extends Annotation

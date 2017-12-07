@@ -2,6 +2,7 @@ package sjest
 
 import sbt.testing.TaskDef
 import sjest.jest.JestApi
+import sjest.support.MutableContext
 
 import scala.scalajs.reflect.annotation.EnableReflectiveInstantiation
 
@@ -14,12 +15,15 @@ abstract class JestSuite extends JestApi {
   }
 
   protected final def describe(description: String)(tests: => Unit): Unit = {
-
+    jsTestContainer.setDescribeGroup(Some(description))
+    tests
   }
 
   private[sjest] final def getTestCase(taskDef: TaskDef): JsTestContainer = {
-    jsTestContainer.setName(taskDef.fullyQualifiedName())
+    jsTestContainer.setSuiteName(taskDef.fullyQualifiedName())
   }
 }
 
-//private case class DescriptionContext(description: String) extends AnyVal
+private object JestSuite {
+  implicit val mutableContext: MutableContext[JestSuite] = new MutableContext[JestSuite] {}
+}

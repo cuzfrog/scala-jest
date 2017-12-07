@@ -1,42 +1,66 @@
 package sjest
 
+import sjest.support.{MutableContext, Stateful}
+
 import scala.collection.mutable
 import scala.scalajs.js
 
-private final class JsTestContainer {
+private final case class JsTestCase(name: String, runBlock: js.Function)
 
-  private var name: String = _
-  private val tests: mutable.ArrayBuffer[JsTestCase] = mutable.ArrayBuffer.empty
-
-  def add[T](name: String, testBlock: () => T,
-             description: Option[String] = None): Unit = {
-    if (tests.exists(_.name == name))
-      throw new IllegalArgumentException(s"Test description cannot be duplicated: '$name'")
-    tests += JsTestCase(name, testBlock, description)
-  }
+@Stateful
+private final class JsTestGroup(val descr: Option[String] = None) {
+  private[this] val tests: mutable.ArrayBuffer[JsTestCase] = mutable.ArrayBuffer.empty
 
   def getTests: Seq[JsTestCase] = tests.clone()
+  def add[T](name: String, testBlock: () => T)
+            (implicit mutableContext: MutableContext[JestSuite]): Unit = {
+    if (tests.exists(_.name == name))
+      throw new IllegalArgumentException(s"Duplicated test name: '$name'")
+    tests += JsTestCase(name, testBlock)
+  }
+}
 
-  def setName(name: String): this.type = {
+@Stateful
+private final class JsTestContainer {
+
+  private[this] var suiteName: String = _
+  private[this] var currentGroup: JsTestGroup = new JsTestGroup()
+  private[this] val gruops: mutable.ArrayBuffer[JsTestGroup] = mutable.ArrayBuffer(currentGroup)
+
+  def add[T](name: String, testBlock: () => T)
+            (implicit mutableContext: MutableContext[JestSuite]): Unit = {
+    currentGroup.add(name, testBlock)
+  }
+
+  def setDescribeGroup(description: Option[String] = None)
+                      (implicit mutableContext: MutableContext[JestSuite]): Unit = {
+    gruops.find(_.descr == description) match{
+      case Some(group) => currentGroup = group
+      case None =>
+        currentGroup = new JsTestGroup(description)
+        gruops += currentGroup
+    }
+  }
+
+  def getGroups: Seq[JsTestGroup] = gruops.clone()
+  def getTests: Seq[JsTestCase] = gruops.flatMap(_.getTests)
+
+  def setSuiteName(name: String)(implicit mutableContext: MutableContext[JestSuite]): this.type = {
     require(name.matches("""[\w-_\.]*\$?"""), s"Bad module name: $name")
-    this.name = name
+    this.suiteName = name
     this
   }
 
-  def getName: String = {
+  def getSuiteName: String = {
     checkNameState()
-    this.name
+    this.suiteName
   }
 
   def getFilename: String = {
     checkNameState()
-    s"$name.test.js"
+    s"$suiteName.test.js"
   }
 
   private def checkNameState(): Unit =
-    if (name == null) throw new IllegalStateException("Name not set.")
+    if (suiteName == null) throw new IllegalStateException("Name not set.")
 }
-
-private final case class JsTestCase(name: String,
-                                    runBlock: js.Function,
-                                    description: Option[String] = None)

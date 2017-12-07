@@ -8,17 +8,16 @@ import scala.scalajs.reflect.Reflect
 
 private object JsTestStub {
   @JSExportTopLevel("loadTest")
-  def loadTest(fqcn: String, keyDescription: String): js.Function = {
+  def loadTest(fqcn: String, testName: String): js.Function = {
     val testSuite = Reflect.lookupInstantiatableClass(fqcn) match {
       case Some(moduleClass) => moduleClass.newInstance().asInstanceOf[JestSuite]
       case None => throw new ClassNotFoundException(fqcn)
     }
 
-    testSuite.jsTestContainer.getTests
-      .collectFirst { case (desc, cb) if desc == keyDescription => cb } match {
-      case Some(codeBlock) => codeBlock
+    testSuite.jsTestContainer.getTests.find(_.name == testName) match {
+      case Some(test) => test.runBlock
       case None => throw new IllegalArgumentException(
-        s"Cannot find test '$keyDescription' in '$fqcn', is *opt.js file stale?")
+        s"Cannot find test '$testName' in '$fqcn', is *opt.js file stale?")
     }
   }
 }

@@ -24,9 +24,9 @@ private final class JsTestConverterImpl(implicit config: TestFrameworkConfig)
       s"""const out = require('${this.resolveOptJsPath}');
          |const loadTest = out.loadTest""".stripMargin
 
-    val contents = jsTestContainer.getTests.map { case (description, _) =>
-      s"""test('$description', () => {
-         |  loadTest('${jsTestContainer.getName}','$description')();
+    val contents = jsTestContainer.getTests.map { test =>
+      s"""test('${test.name}', () => {
+         |  loadTest('${jsTestContainer.getSuiteName}','${test.name}')();
          |});""".stripMargin
     }
 
