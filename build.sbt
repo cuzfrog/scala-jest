@@ -7,7 +7,17 @@ inThisBuild(Seq(
   version := "0.1.0-SNAPSHOT"
 ))
 
-val root = (project in file("."))
+val macros = project
+  .enablePlugins(ScalaJSPlugin)
+  .settings(commonSettings)
+  .settings(
+    name := "sjest-macros",
+    libraryDependencies ++= Seq(
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value
+    )
+  )
+
+val root = (project in file(".")).dependsOn(macros)
   .enablePlugins(ScalaJSPlugin)
   .settings(commonSettings, publicationSettings, readmeVersionSettings)
   .settings(

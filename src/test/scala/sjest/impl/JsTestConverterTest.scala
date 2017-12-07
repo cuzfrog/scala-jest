@@ -2,7 +2,7 @@ package sjest.impl
 
 import io.scalajs.nodejs.fs.Fs
 import io.scalajs.nodejs.path.Path
-import sjest.{JsTestCase, MockObjects}
+import sjest.{JsTestContainer, MockObjects}
 import sjest.nodejs.FSUtils
 import utest._
 
@@ -13,11 +13,11 @@ object JsTestConverterTest extends TestSuite {
   private val descripton2 = Random.genAlphanumeric(20)
 
   private val mockTestCase = {
-    val jsTestCase = new JsTestCase
-    jsTestCase.add(descripton1, () => ())
-    jsTestCase.add(descripton2, () => println("make some noise"))
+    val jsTestContainer = new JsTestContainer
+    jsTestContainer.add(descripton1, () => ())
+    jsTestContainer.add(descripton2, () => println("make some noise"))
     val randomName = Random.genAlphanumeric(5)
-    jsTestCase.setName(randomName)
+    jsTestContainer.setName(randomName)
   }
 
   import MockObjects.mockConfig //implicit config

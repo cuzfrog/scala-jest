@@ -3,7 +3,7 @@ package sjest.impl
 import io.scalajs.nodejs.path.Path
 import sjest.nodejs.FSUtils
 import sjest.support.Stateless
-import sjest.{JsTestCase, TestFrameworkConfig}
+import sjest.{JsTestContainer, TestFrameworkConfig}
 
 @Stateless
 private sealed trait JsTestConverter {
@@ -12,27 +12,27 @@ private sealed trait JsTestConverter {
    *
    * @return the generated file path.
    */
-  def generateJsTest(jsTestCase: JsTestCase): String
+  def generateJsTest(jsTestContainer: JsTestContainer): String
 }
 
 private final class JsTestConverterImpl(implicit config: TestFrameworkConfig)
   extends JsTestConverter {
 
-  def generateJsTest(jsTestCase: JsTestCase): String = {
+  def generateJsTest(jsTestContainer: JsTestContainer): String = {
 
     val module =
       s"""const out = require('${this.resolveOptJsPath}');
          |const loadTest = out.loadTest""".stripMargin
 
-    val contents = jsTestCase.getTests.map { case (description, _) =>
+    val contents = jsTestContainer.getTests.map { case (description, _) =>
       s"""test('$description', () => {
-         |  loadTest('${jsTestCase.getName}','$description')();
+         |  loadTest('${jsTestContainer.getName}','$description')();
          |});""".stripMargin
     }
 
     val content = module + NEWLINE(2) + contents.mkString(NEWLINE)
 
-    val testJsPath = this.resolveTestJsPath(jsTestCase)
+    val testJsPath = this.resolveTestJsPath(jsTestContainer)
     FSUtils.write(testJsPath, content)
     testJsPath
   }
@@ -42,9 +42,9 @@ private final class JsTestConverterImpl(implicit config: TestFrameworkConfig)
     Path.relative(config.testJsDir, config.optJsPath)
   }
 
-  private def resolveTestJsPath(jsTestCase: JsTestCase)
+  private def resolveTestJsPath(jsTestContainer: JsTestContainer)
                                (implicit config: TestFrameworkConfig): String = {
-    Path.resolve(config.testJsDir, jsTestCase.getFilename)
+    Path.resolve(config.testJsDir, jsTestContainer.getFilename)
   }
 }
 

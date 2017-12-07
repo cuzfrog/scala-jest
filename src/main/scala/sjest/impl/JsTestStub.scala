@@ -14,7 +14,7 @@ private object JsTestStub {
       case None => throw new ClassNotFoundException(fqcn)
     }
 
-    testSuite.jsTestCase.getTests
+    testSuite.jsTestContainer.getTests
       .collectFirst { case (desc, cb) if desc == keyDescription => cb } match {
       case Some(codeBlock) => codeBlock
       case None => throw new IllegalArgumentException(
