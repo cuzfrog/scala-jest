@@ -11,7 +11,7 @@ import scala.util.Random
 
 object JsTestConverterTest extends TestSuite with PropertyTest {
 
-  override protected def propertyTestRepeatTime: Int = 20
+  override protected def propertyTestRepeatTime: Int = 50
 
   import MockObjects.mockConfig //implicit config
   private implicit val mutableContext: MutableContext[JestSuite] = new MutableContext[JestSuite] {}
@@ -45,19 +45,18 @@ object JsTestConverterTest extends TestSuite with PropertyTest {
            |const loadTest = out.loadTest
            |
            |test('$testName1', () => {
-           |  loadTest('${mockTestCase.getSuiteName}','$testName1')();
+           |  loadTest('${mockTestCase.getSuiteName}', undefined, '$testName1')();
            |});
            |test('$testName2', () => {
-           |  loadTest('${mockTestCase.getSuiteName}','$testName2')();
+           |  loadTest('${mockTestCase.getSuiteName}', undefined, '$testName2')();
            |});""".stripMargin
       assert(content.contains(expectedContent))
     }
-
-    val description = Some(Random.genAlphanumeric(20))
     "test-nested-in-describe" - {
+      val description = Random.genAlphanumeric(20)
       val mockTestCase = {
         val jsTestContainer = new JsTestContainer
-        jsTestContainer.setDescribeGroup(description)
+        jsTestContainer.setDescribeGroup(Some(description))
         jsTestContainer.add(testName1, () => ())
         jsTestContainer.add(testName2, () => println("make some noise"))
         val randomName = Random.genAlphanumeric(5)
@@ -67,12 +66,12 @@ object JsTestConverterTest extends TestSuite with PropertyTest {
       val content = Fs.readFileSync(path).toString()
       val expectedContent =
         s"""describe('$description', () => {
-           |  test('$testName1', () => {
-           |    loadTest('${mockTestCase.getSuiteName}','$testName1')();
-           |  });
-           |  test('$testName2', () => {
-           |    loadTest('${mockTestCase.getSuiteName}','$testName2')();
-           |  });
+           |test('$testName1', () => {
+           |  loadTest('${mockTestCase.getSuiteName}', '$description', '$testName1')();
+           |});
+           |test('$testName2', () => {
+           |  loadTest('${mockTestCase.getSuiteName}', '$description', '$testName2')();
+           |});
            |});""".stripMargin
 
       assert(content endsWith expectedContent)
