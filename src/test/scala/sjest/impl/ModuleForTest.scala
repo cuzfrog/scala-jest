@@ -1,7 +1,6 @@
 package sjest.impl
 
 import com.softwaremill.macwire._
-import sjest.conversion.JsTestConverter
 import sjest.{JestFramework, MockObjects, TestFrameworkConfig}
 
 private final

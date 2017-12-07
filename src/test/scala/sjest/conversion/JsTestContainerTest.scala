@@ -20,7 +20,7 @@ object JsTestContainerTest extends TestSuite with PropertyTest {
       assert(impl.getTests.isEmpty)
       val testName = Random.genAlphanumeric(20)
       val returnValue = Random.genAlphanumeric(40)
-      impl.add(testName, () => returnValue)
+      impl.addTest(testName, () => returnValue)
       assert(impl.getTests.size == 1)
       val test = impl.getTests.head
       assert(test.name == testName)
@@ -42,13 +42,13 @@ object JsTestContainerTest extends TestSuite with PropertyTest {
         impl.setSuiteName("bad name contains space")
       }
     }
-    "negative-dupliciate-names" - {
-      impl.add("same", () => ())
-      intercept[IllegalArgumentException](impl.add("same", () => ()))
+    "negative-duplicate-names" - {
+      impl.addTest("same", () => ())
+      intercept[IllegalArgumentException](impl.addTest("same", () => ()))
     }
     "order-retain" - {
       val expectedNames = (0 to Random.nextInt(50)).map { idx => Random.genAlphanumeric(2) + idx }
-      expectedNames.foreach(impl.add(_, () => ()))
+      expectedNames.foreach(impl.addTest(_, () => ()))
 
       val resultNames = impl.getTests.map(_.name)
       assert(resultNames == expectedNames)
@@ -60,8 +60,8 @@ object JsTestContainerTest extends TestSuite with PropertyTest {
         val descrOpt = if (groupId == 0) None else Some(Random.genAlphanumeric(10))
         descrOpt.foreach(impl.enterDescribe)
         val testNames = (0 to Random.nextInt(20)).map(_ => Random.genAlphanumeric(20))
-        testNames.foreach(name => impl.add(name, () => ()))
-        descrOpt.foreach(impl.escapeDescribe)
+        testNames.foreach(name => impl.addTest(name, () => ()))
+        descrOpt.foreach(_ => impl.escapeDescribe)
         testNames
       }
 
@@ -69,13 +69,33 @@ object JsTestContainerTest extends TestSuite with PropertyTest {
       assert(resultNames == expectedTestNames)
     }
     "nested-describe-query" - {
-      impl.enterDescribe("1")
-      ???
-      impl.enterDescribe("1")
+      impl.setSuiteName("some.suite.name")
+      impl.addTest("t0", () => "v0")
+      impl.enterDescribe("d1");
+      {
+        impl.addTest("t1", () => "v1")
+        impl.enterDescribe("d2");
+        {
+          impl.addTest("t2", () => "v2")
+        }
+        impl.escapeDescribe()
+      }
+      impl.escapeDescribe()
+      val testCase2 = impl.queryTestCase(Seq("d1", "d2", "t2"))
+      val v2 = testCase2.runBlock.apply()
+      assert(v2 == "v2")
+
+      val testCase1 = impl.queryTestCase(Seq("d1", "t1"))
+      val v1 = testCase1.runBlock.apply()
+      assert(v1 == "v1")
+
+      val testCase0 = impl.queryTestCase(Seq("t0"))
+      val v0 = testCase0.runBlock.apply()
+      assert(v0 == "v0")
     }
   }
 
   override protected def propertyTestPathFilter: Seq[String] = Seq(
-    "constraint-behavior", "negative-dupliciate-names"
+    "constraint-behavior", "negative-duplicate-names", "nested-describe-query"
   )
 }

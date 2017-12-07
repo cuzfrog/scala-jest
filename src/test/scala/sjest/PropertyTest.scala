@@ -27,6 +27,11 @@ trait PropertyTest extends TestSuite {
     }
   }
 
+  override def utestAfterAll(): Unit = {
+    checkPathsInPathFilter()
+    super.utestAfterAll()
+  }
+
   /** Check if path filters are not matched with test paths. */
   private def checkPathsInPathFilter(): Unit = {
     val paths = extractPaths(this.tests.nameTree)
@@ -41,6 +46,4 @@ trait PropertyTest extends TestSuite {
     if (nameTree.children.isEmpty) paths :+ nameTree.value
     else nameTree.children.flatMap(extractPaths(_, paths))
   }
-
-  checkPathsInPathFilter()
 }

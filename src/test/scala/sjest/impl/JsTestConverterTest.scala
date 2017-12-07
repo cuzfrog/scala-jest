@@ -28,8 +28,8 @@ object JsTestConverterTest extends TestSuite with PropertyTest {
     "test.js-generation" - {
       val mockTestCase = {
         val jsTestContainer = new JsTestContainer
-        jsTestContainer.add(testName1, () => ())
-        jsTestContainer.add(testName2, () => println("make some noise"))
+        jsTestContainer.addTest(testName1, () => ())
+        jsTestContainer.addTest(testName2, () => println("make some noise"))
         val randomName = Random.genAlphanumeric(5)
         jsTestContainer.setSuiteName(randomName)
       }
@@ -58,9 +58,9 @@ object JsTestConverterTest extends TestSuite with PropertyTest {
       val mockTestCase = {
         val jsTestContainer = new JsTestContainer
         jsTestContainer.enterDescribe(description)
-        jsTestContainer.add(testName1, () => ())
-        jsTestContainer.add(testName2, () => println("make some noise"))
-        jsTestContainer.escapeDescribe(description)
+        jsTestContainer.addTest(testName1, () => ())
+        jsTestContainer.addTest(testName2, () => println("make some noise"))
+        jsTestContainer.escapeDescribe()
         val randomName = Random.genAlphanumeric(5)
         jsTestContainer.setSuiteName(randomName)
       }

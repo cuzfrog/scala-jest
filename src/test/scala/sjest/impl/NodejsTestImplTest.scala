@@ -3,7 +3,7 @@ package sjest.impl
 import io.scalajs.nodejs.path.Path
 import sbt.testing.{Status, TaskDef}
 import sjest.nodejs.FSUtils
-import sjest.{MockObjects, TestFrameworkConfig}
+import sjest.{MockObjects, TestFrameworkConfig, NEWLINE}
 import utest._
 
 import scala.util.Random

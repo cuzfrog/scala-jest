@@ -12,13 +12,13 @@ abstract class JestSuite extends JestApi {
   private[sjest] val jsTestContainer = new JsTestContainer
 
   protected final def test[T](name: String)(block: => T): Unit = {
-    jsTestContainer.add(name, () => block)
+    jsTestContainer.addTest(name, () => block)
   }
 
   protected final def describe(description: String)(block: => Unit): Unit = {
     jsTestContainer.enterDescribe(description)
     block
-    jsTestContainer.escapeDescribe(description)
+    jsTestContainer.escapeDescribe()
   }
 
   private[sjest] final def getTestCase(taskDef: TaskDef): JsTestContainer = {

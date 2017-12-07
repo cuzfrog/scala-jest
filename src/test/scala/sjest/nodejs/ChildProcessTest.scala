@@ -4,7 +4,7 @@ import utest._
 
 import scala.scalajs.js
 
-import sjest.impl.NEWLINE
+import sjest.NEWLINE
 
 object ChildProcessTest extends TestSuite {
   val tests = Tests {
