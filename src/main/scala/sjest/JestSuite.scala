@@ -1,6 +1,7 @@
 package sjest
 
 import sbt.testing.TaskDef
+import sjest.conversion.JsTestContainer
 import sjest.jest.JestApi
 import sjest.support.MutableContext
 
@@ -14,9 +15,10 @@ abstract class JestSuite extends JestApi {
     jsTestContainer.add(name, () => block)
   }
 
-  protected final def describe(description: String)(tests: => Unit): Unit = {
-    jsTestContainer.setDescribeGroup(Some(description))
-    tests
+  protected final def describe(description: String)(block: => Unit): Unit = {
+    jsTestContainer.enterDescribe(description)
+    block
+    jsTestContainer.escapeDescribe(description)
   }
 
   private[sjest] final def getTestCase(taskDef: TaskDef): JsTestContainer = {

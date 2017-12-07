@@ -56,9 +56,10 @@ object JsTestConverterTest extends TestSuite with PropertyTest {
       val description = Random.genAlphanumeric(20)
       val mockTestCase = {
         val jsTestContainer = new JsTestContainer
-        jsTestContainer.setDescribeGroup(Some(description))
+        jsTestContainer.enterDescribe(description)
         jsTestContainer.add(testName1, () => ())
         jsTestContainer.add(testName2, () => println("make some noise"))
+        jsTestContainer.escapeDescribe(description)
         val randomName = Random.genAlphanumeric(5)
         jsTestContainer.setSuiteName(randomName)
       }

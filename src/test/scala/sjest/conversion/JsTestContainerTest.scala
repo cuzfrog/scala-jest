@@ -1,75 +1,77 @@
-package sjest
+package sjest.conversion
 
-import utest._
-
-import scala.util.Random
 import sjest.impl.ExRandom
 import sjest.support.MutableContext
+import sjest.{JestSuite, PropertyTest}
+import utest._
 
 import scala.scalajs.js
+import scala.util.Random
 
 object JsTestContainerTest extends TestSuite with PropertyTest {
 
   private implicit val mutableContext: MutableContext[JestSuite] = new MutableContext[JestSuite] {}
 
   val tests = Tests {
-    val jsTestContainer = new JsTestContainer
+    val impl = new JsTestContainer
     val suiteName = Random.genAlphanumeric(5)
 
     "normal-behavior" - {
-      assert(jsTestContainer.getTests.isEmpty)
+      assert(impl.getTests.isEmpty)
       val testName = Random.genAlphanumeric(20)
       val returnValue = Random.genAlphanumeric(40)
-      jsTestContainer.add(testName, () => returnValue)
-      assert(jsTestContainer.getTests.size == 1)
-      val test = jsTestContainer.getTests.head
+      impl.add(testName, () => returnValue)
+      assert(impl.getTests.size == 1)
+      val test = impl.getTests.head
       assert(test.name == testName)
       val runBlock = test.runBlock.asInstanceOf[js.Function0[String]]
       assert(runBlock() == returnValue)
 
-      jsTestContainer.setSuiteName(suiteName)
-      assert(jsTestContainer.getSuiteName == suiteName)
-      assert(jsTestContainer.getFilename == suiteName + ".test.js")
+      impl.setSuiteName(suiteName)
+      assert(impl.getSuiteName == suiteName)
+      assert(impl.getFilename == suiteName + ".test.js")
     }
     "constraint-behavior" - {
       intercept[IllegalStateException] {
-        jsTestContainer.getSuiteName
+        impl.getSuiteName
       }
       intercept[IllegalStateException] {
-        jsTestContainer.getFilename
+        impl.getFilename
       }
       intercept[IllegalArgumentException] {
-        jsTestContainer.setSuiteName("bad name contains space")
+        impl.setSuiteName("bad name contains space")
       }
     }
     "negative-dupliciate-names" - {
-      jsTestContainer.add("same", () => ())
-      intercept[IllegalArgumentException](jsTestContainer.add("same", () => ()))
+      impl.add("same", () => ())
+      intercept[IllegalArgumentException](impl.add("same", () => ()))
     }
     "order-retain" - {
       val expectedNames = (0 to Random.nextInt(50)).map { idx => Random.genAlphanumeric(2) + idx }
-      expectedNames.foreach(jsTestContainer.add(_, () => ()))
+      expectedNames.foreach(impl.add(_, () => ()))
 
-      val resultNames = jsTestContainer.getTests.map(_.name)
+      val resultNames = impl.getTests.map(_.name)
       assert(resultNames == expectedNames)
     }
     "describe-group" - {
-      assert(jsTestContainer.getGroups.size == 1)
+      assert(impl.getTests.isEmpty)
       val groupCnt = Random.nextInt(6) + 1
       val expectedTestNames = (0 until groupCnt).flatMap { groupId =>
-        val description = if (groupId == 0) None else Some(Random.genAlphanumeric(10))
-        jsTestContainer.setDescribeGroup(description)
+        val descrOpt = if (groupId == 0) None else Some(Random.genAlphanumeric(10))
+        descrOpt.foreach(impl.enterDescribe)
         val testNames = (0 to Random.nextInt(20)).map(_ => Random.genAlphanumeric(20))
-        testNames.foreach(name => jsTestContainer.add(name, () => ()))
-
+        testNames.foreach(name => impl.add(name, () => ()))
+        descrOpt.foreach(impl.escapeDescribe)
         testNames
       }
 
-      val testGroups = jsTestContainer.getGroups
-      assert(testGroups.size == groupCnt)
-
-      val resultNames = testGroups.flatMap(_.getTests.map(_.name))
+      val resultNames = impl.getTests.map(_.name)
       assert(resultNames == expectedTestNames)
+    }
+    "nested-describe-query" - {
+      impl.enterDescribe("1")
+      ???
+      impl.enterDescribe("1")
     }
   }
 

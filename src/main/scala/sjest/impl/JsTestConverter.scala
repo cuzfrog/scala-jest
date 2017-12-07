@@ -1,9 +1,10 @@
 package sjest.impl
 
 import io.scalajs.nodejs.path.Path
+import sjest.conversion.JsTestContainer
 import sjest.nodejs.FSUtils
 import sjest.support.Stateless
-import sjest.{JsTestContainer, TestFrameworkConfig}
+import sjest.TestFrameworkConfig
 
 @Stateless
 private sealed trait JsTestConverter {
@@ -34,18 +35,15 @@ private final class JsTestConverterImpl(implicit config: TestFrameworkConfig)
   }
 
   private def genContents(jsTestContainer: JsTestContainer): Seq[String] = {
-    jsTestContainer.getGroups.filter(_.getTests.nonEmpty).flatMap { group =>
-      val descr = group.descr match {
-        case Some(dsc) => s"'$dsc'"
-        case None => "undefined"
-      }
-      val tests = group.getTests.map { test =>
-        s"""test('${test.name}', () => {
-           |  loadTest('${jsTestContainer.getSuiteName}', $descr, '${test.name}')();
-           |});""".stripMargin
-      }
-      wrapDescribe(group.descr, tests)
-    }
+
+
+//      val tests = group.getTests.map { test =>
+//        s"""test('${test.name}', () => {
+//           |  loadTest('${jsTestContainer.getSuiteName}', $descr, '${test.name}')();
+//           |});""".stripMargin
+//      }
+//
+    ???
   }
 
   private def wrapDescribe(descr: Option[String], tests: Seq[String]): Seq[String] = {

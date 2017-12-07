@@ -24,3 +24,6 @@ private[sjest] final class Service extends Annotation
 
 @Documented
 private[sjest] final class InternalControl extends Annotation
+
+@Documented
+private[sjest] final class TypeClass extends Annotation
