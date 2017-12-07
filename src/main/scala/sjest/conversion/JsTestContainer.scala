@@ -28,7 +28,13 @@ private[sjest] final class JsTestContainer {
   }
 
   def testContent: String = testTree.toJsTest()
-  private[conversion] def queryTestCase(path: Seq[String]): JsTestCase = ???
+  private[conversion] def queryTestCase(paths: Seq[String]): JsTestCase = {
+    checkNameState()
+    testTree.query(paths) match{
+      case Some(testCase:JsTestCase) => testCase
+      case _ => throw new IllegalArgumentException(s"Cannot query test '${paths.last}' in '$suiteName'")
+    }
+  }
 
   def setSuiteName(name: String)(implicit mutableContext: MutableContext[JestSuite]): this.type = {
     require(name.matches("""[\w-_\.]*\$?"""), s"Bad module name: $name")

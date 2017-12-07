@@ -14,12 +14,6 @@ private final class JsTestGroup(val descr: Option[String] = None,
 
   private val subTrees: mutable.ArrayBuffer[JsTestTree] = mutable.ArrayBuffer.empty
 
-  @VisibleForTest
-  def getTests: Seq[JsTestCase] = subTrees.flatMap {
-    case group: JsTestGroup => group.getTests
-    case testCase: JsTestCase => Seq(testCase)
-  }
-
   def addTest[T](name: String, testBlock: () => T)
                 (implicit mutableContext: MutableContext[JestSuite]): Unit = {
     if (subTrees.collectFirst { case testCase: JsTestCase if testCase.name == name => testCase }.nonEmpty)
@@ -32,6 +26,19 @@ private final class JsTestGroup(val descr: Option[String] = None,
     val child = new JsTestGroup(Some(description), Some(this))
     subTrees += child
     child
+  }
+
+  def query(paths: Seq[String]): Option[JsTestTree] = {
+    paths.foldLeft(Option(self: JsTestTree)) { (treeOpt, path) =>
+      treeOpt match {
+        case Some(group: JsTestGroup) =>
+          group.subTrees.find {
+            case group: JsTestGroup => group.descr.contains(path)
+            case testCase: JsTestCase => testCase.name == path
+          }
+        case _ => None
+      }
+    }
   }
 
   override def clone(): JsTestGroup = {
@@ -48,6 +55,12 @@ private final class JsTestGroup(val descr: Option[String] = None,
     if (subTrees.nonEmpty)
       throw new IllegalStateException("setTrees can only be used on fresh JsTestGroup")
     subTrees ++ trees
+  }
+
+  @VisibleForTest
+  def getTests: Seq[JsTestCase] = subTrees.flatMap {
+    case group: JsTestGroup => group.getTests
+    case testCase: JsTestCase => Seq(testCase)
   }
 }
 

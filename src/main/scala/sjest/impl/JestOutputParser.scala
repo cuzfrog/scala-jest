@@ -2,6 +2,7 @@ package sjest.impl
 
 import com.sun.istack.internal.Nullable
 import sjest.support.Stateless
+import sjest.NEWLINE
 
 @Stateless
 private sealed trait JestOutputParser extends Function1[String, TestCaseResult] {

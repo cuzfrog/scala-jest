@@ -12,22 +12,19 @@ object JsTestStubTest extends TestSuite {
 
   val tests = Tests {
     "loadTest-positive" - {
-      val function = JsTestStub.loadTest(classname, js.undefined, "mock test").asInstanceOf[js.Function0[String]]
+      val function = JsTestStub.loadTest(classname, Seq("mock test")).asInstanceOf[js.Function0[String]]
       assert(sideEffectMarker == 0)
       function()
       assert(sideEffectMarker == 1)
     }
     "loadTest-negative-classname" - {
       intercept[ClassNotFoundException] {
-        JsTestStub.loadTest("some.bad.name", js.undefined, "mock test")
+        JsTestStub.loadTest("some.bad.name", Seq("mock test"))
       }
     }
-    "loadTest-negative-bad-id" - {
+    "loadTest-negative-bad-path" - {
       intercept[IllegalArgumentException] {
-        JsTestStub.loadTest(classname, "bad descr", "mock test")
-      }
-      intercept[IllegalArgumentException] {
-        JsTestStub.loadTest(classname, js.undefined, "bad test name")
+        JsTestStub.loadTest(classname, Seq("bad path asdfasdf"))
       }
     }
   }
