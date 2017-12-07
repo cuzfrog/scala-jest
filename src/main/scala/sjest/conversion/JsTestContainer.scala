@@ -30,7 +30,7 @@ private[sjest] final class JsTestContainer {
 
   def testContent: String = testTree.toJsTest()
   private[conversion] def queryTestCase(paths: Seq[String]): JsTestCase = {
-    checkNameState()
+    checkDepth()
     testTree.query(paths) match {
       case Some(testCase: JsTestCase) => testCase
       case _ => throw new IllegalArgumentException(s"Cannot query test '${paths.last}' in '$suiteName'")

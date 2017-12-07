@@ -69,7 +69,6 @@ object JsTestContainerTest extends TestSuite with PropertyTest {
       assert(resultNames == expectedTestNames)
     }
     "nested-describe-query" - {
-      impl.setSuiteName("some.suite.name")
       impl.addTest("t0", () => "v0")
       impl.enterDescribe("d1");
       {
@@ -92,6 +91,10 @@ object JsTestContainerTest extends TestSuite with PropertyTest {
       val testCase0 = impl.queryTestCase(Seq("t0"))
       val v0 = testCase0.runBlock.apply()
       assert(v0 == "v0")
+    }
+    "bad-nested-describe" - {
+      impl.enterDescribe("")
+      intercept[IllegalStateException](impl.queryTestCase(Seq("")))
     }
   }
 
