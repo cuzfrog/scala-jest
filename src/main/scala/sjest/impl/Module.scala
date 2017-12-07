@@ -25,9 +25,9 @@ private[sjest] object Module {
            remoteArgs: Array[String] = Array.empty,
            communicationTunnel: Option[String => Unit] = None)
           (implicit config: TestFrameworkConfig): this.type = {
-    if (moduleRef.get() != null)
+    val newModule = new ImplementationModule(args, remoteArgs, communicationTunnel)
+    if (!moduleRef.compareAndSet(null, newModule))
       throw new IllegalStateException("DI module can only be initiated once.")
-    moduleRef.compareAndSet(null, new ImplementationModule(args, remoteArgs, communicationTunnel))
     this
   }
 
