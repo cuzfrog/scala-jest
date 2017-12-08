@@ -9,10 +9,11 @@ private object JsTestCase {
     new Convertible[JsTestCase, Seq[String] => String] {
       override def convert(t: JsTestCase): Seq[String] => String = {
         val convertFromPath = (upperPath: Seq[String]) => {
-          val jsPath = "['" + (upperPath :+ t.name).mkString("','") + "']"
+          val (fqcn :: path) = upperPath
+          val jsPath = "['" + (path :+ t.name).mkString("','") + "']"
 
           s"""test('${t.name}', () => {
-             |  loadTest($jsPath)();
+             |  loadTest('$fqcn',$jsPath)();
              |});""".stripMargin
         }
         convertFromPath

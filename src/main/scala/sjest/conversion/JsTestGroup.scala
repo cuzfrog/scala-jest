@@ -7,16 +7,16 @@ import scala.collection.mutable
 
 @Stateful
 private final class JsTestGroup(val descr: Option[String] = None,
-                                val parent: Option[JsTestGroup] = None) extends JsTestTree {
-  self =>
+                                val parent: Option[JsTestGroup] = None) extends JsTestTree { self =>
 
   private val subTrees: mutable.ArrayBuffer[JsTestTree] = mutable.ArrayBuffer.empty
 
   def addTest[T](name: String, testBlock: () => T)
-                (implicit mutableContext: MutableContext[JestSuite]): Unit = {
+                (implicit mutableContext: MutableContext[JestSuite]): self.type = {
     if (subTrees.collectFirst { case testCase: JsTestCase if testCase.name == name => testCase }.nonEmpty)
       throw new IllegalArgumentException(s"Duplicated test name: '$name'")
     subTrees += JsTestCase(name, testBlock)
+    self
   }
 
   def addDescribe(description: String)

@@ -1,30 +1,35 @@
 package sjest.conversion
 
-import sjest.JestSuite
 import utest._
 
+import scala.collection.mutable
 import scala.util.Random
 
 object JsTestGroupTest extends sjest.BaseSuite {
 
-  import JestSuite.mutableContext
+  import sjest.JestSuiteContext.mutableContext
 
   val tests = Tests {
     val mockTopGroup = new JsTestGroup()
     val suiteName = Random.genAlphanumeric(15) + "_suite"
-    "behavior" - {
-      val mockTests = (1 to Random.nextInt(30)).map { idx =>
-        JsTestCase
+    "clone-behavior" - {
+      val cloneGroup = mockTopGroup.clone()
+      val mockTestNames = (1 to Random.nextInt(30)).map { idx =>
+        Random.genAlphanumeric(15) + "_test" + idx
       }
-      //mockTopGroup.addTest()
+      mockTestNames.foreach(n => mockTopGroup.addTest(n, () => ()))
+      assert(cloneGroup.getTests.isEmpty)
+      cloneGroup.addTest("more", () => ())
+      assert(mockTopGroup.getTests.map(_.name) == mockTestNames)
     }
+
     val testName = Random.genAlphanumeric(15) + "_test"
     "toJsTest-content" - {
       mockTopGroup.addTest(testName, () => ())
       val content = mockTopGroup.toJsTest(Seq(suiteName))
       val expectedContent =
         s"""test('$testName', () => {
-           |  loadTest(['$suiteName','$testName'])();
+           |  loadTest('$suiteName',['$testName'])();
            |});""".stripMargin
       assert(content == expectedContent)
     }
@@ -36,7 +41,7 @@ object JsTestGroupTest extends sjest.BaseSuite {
       val expectedContent =
         s"""describe('$description', () => {
            |test('$testName', () => {
-           |  loadTest(['$suiteName','$description','$testName'])();
+           |  loadTest('$suiteName',['$description','$testName'])();
            |});
            |});""".stripMargin
       assert(content == expectedContent)

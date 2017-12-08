@@ -3,8 +3,6 @@ package sjest
 import sbt.testing.{SuiteSelector, TaskDef}
 import sjest.conversion.JsTestStubTest
 
-import scala.scalajs.js
-
 private object MockObjects {
   implicit val mockConfig: TestFrameworkConfig = JestFramework.defaultConfig.copy(
     optJsPath = "target/tmp/dir1/fastopt.js",
@@ -23,7 +21,11 @@ private object MockObjects {
 }
 
 private final class MockSuccessTest extends JestSuite {
+  import JestSuiteContext.mutableContext
+
   test("mock test") {
     JsTestStubTest.sideEffectMarker += 1
   }
+
+  this.jsTestContainer.setSuiteName(this.getClass.getName)
 }

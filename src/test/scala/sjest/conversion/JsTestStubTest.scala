@@ -12,19 +12,19 @@ object JsTestStubTest extends sjest.BaseSuite {
 
   val tests = Tests {
     "loadTest-positive" - {
-      val function = JsTestStub.loadTest(classname, Seq("mock test")).asInstanceOf[js.Function0[String]]
+      val function = JsTestStub.loadTest(classname, js.Array("mock test")).asInstanceOf[js.Function0[String]]
       assert(sideEffectMarker == 0)
       function()
       assert(sideEffectMarker == 1)
     }
     "loadTest-negative-classname" - {
       intercept[ClassNotFoundException] {
-        JsTestStub.loadTest("some.bad.name", Seq("mock test"))
+        JsTestStub.loadTest("some.bad.name", js.Array("mock test"))
       }
     }
     "loadTest-negative-bad-path" - {
       intercept[IllegalArgumentException] {
-        JsTestStub.loadTest(classname, Seq("bad path asdfasdf"))
+        JsTestStub.loadTest(classname, js.Array("bad path asdfasdf"))
       }
     }
   }

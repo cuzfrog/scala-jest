@@ -53,7 +53,7 @@ private class ImplementationModule(args: Array[String],
 
   // ------ Prototypes ------
   protected final def jestOutputParser: JestOutputParser = wire[JestOutputParserImpl]
-  protected final def jsTestConverter: JsTestGenerator = wire[JsTestGeneratorImpl]
+  protected final def jsTestGenerator: JsTestGenerator = wire[JsTestGeneratorImpl]
   @VisibleForTest final def nodejsTest: NodejsTest = wire[NodejsTestImpl]
 
   final def jestRunner: JestRunner = {

@@ -1,8 +1,6 @@
 package sjest.conversion
 
-import io.scalajs.nodejs.fs.Fs
-import sjest.impl.JsTestConverterTest.impl
-import sjest.{JestSuite, PropertyTest}
+import sjest.PropertyTest
 import utest._
 
 import scala.scalajs.js
@@ -10,7 +8,7 @@ import scala.util.Random
 
 object JsTestContainerTest extends sjest.BaseSuite with PropertyTest {
 
-  import JestSuite.mutableContext
+  import sjest.JestSuiteContext.mutableContext
 
   val tests = Tests {
     val impl = new JsTestContainer
@@ -42,7 +40,7 @@ object JsTestContainerTest extends sjest.BaseSuite with PropertyTest {
       val expectedContent =
         s"""describe('$description', () => {
            |test('$testName', () => {
-           |  loadTest(['${mockTestCase.getSuiteName}','$description','$testName'])();
+           |  loadTest('${mockTestCase.getSuiteName}',['$description','$testName'])();
            |});
            |});""".stripMargin
 

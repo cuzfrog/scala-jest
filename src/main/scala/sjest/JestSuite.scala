@@ -9,6 +9,9 @@ import scala.scalajs.reflect.annotation.EnableReflectiveInstantiation
 
 @EnableReflectiveInstantiation
 abstract class JestSuite extends JestApi {
+
+  import JestSuiteContext.mutableContext
+
   private[sjest] val jsTestContainer = new JsTestContainer
 
   protected final def test[T](name: String)(block: => T): Unit = {
@@ -26,6 +29,6 @@ abstract class JestSuite extends JestApi {
   }
 }
 
-private object JestSuite {
+private object JestSuiteContext {
   implicit val mutableContext: MutableContext[JestSuite] = new MutableContext[JestSuite] {}
 }

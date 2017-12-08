@@ -8,5 +8,6 @@ package object impl extends PackageCommon{
   private[sjest] implicit class LoggersOps(in: Array[Logger]) {
     def error(msg: String): Unit = in.foreach(_.error(msg))
     def info(msg: String): Unit = in.foreach(_.info(msg))
+    def debug(msg: String): Unit = in.foreach(_.debug(msg))
   }
 }

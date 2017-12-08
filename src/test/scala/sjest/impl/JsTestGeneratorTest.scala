@@ -10,13 +10,13 @@ import utest._
 
 import scala.util.Random
 
-object JsTestConverterTest extends sjest.BaseSuite with PropertyTest {
+object JsTestGeneratorTest extends sjest.BaseSuite with PropertyTest {
 
   override protected def propertyTestRepeatTime: Int = 50
 
   import MockObjects.mockConfig //implicit config
   private implicit val mutableContext: MutableContext[JestSuite] = new MutableContext[JestSuite] {}
-  private val impl = ModuleForTest().Prototype.jsTestConverter
+  private val impl = ModuleForTest().Prototype.jsTestGenerator
 
   override def utestAfterEach(path: Seq[String]): Unit = { //tear down
     FSUtils.delete(mockConfig.testJsDir)
@@ -46,10 +46,10 @@ object JsTestConverterTest extends sjest.BaseSuite with PropertyTest {
            |const loadTest = out.loadTest
            |
            |test('$testName1', () => {
-           |  loadTest(['${mockTestCase.getSuiteName}','$testName1'])();
+           |  loadTest('${mockTestCase.getSuiteName}',['$testName1'])();
            |});
            |test('$testName2', () => {
-           |  loadTest(['${mockTestCase.getSuiteName}','$testName2'])();
+           |  loadTest('${mockTestCase.getSuiteName}',['$testName2'])();
            |});""".stripMargin
       assert(content.contains(expectedContent))
     }

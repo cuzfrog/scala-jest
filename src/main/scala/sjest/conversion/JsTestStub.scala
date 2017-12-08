@@ -8,7 +8,7 @@ import scala.scalajs.reflect.Reflect
 
 private object JsTestStub {
   @JSExportTopLevel("loadTest")
-  def loadTest(fqcn: String, paths: Seq[String]): js.Function = {
+  def loadTest(fqcn: String, paths: js.Array[String]): js.Function = {
     val testSuite = Reflect.lookupInstantiatableClass(fqcn) match {
       case Some(moduleClass) => moduleClass.newInstance().asInstanceOf[JestSuite]
       case None => throw new ClassNotFoundException(fqcn)
