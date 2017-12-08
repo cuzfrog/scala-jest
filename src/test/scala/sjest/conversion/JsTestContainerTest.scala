@@ -11,8 +11,8 @@ object JsTestContainerTest extends sjest.BaseSuite with PropertyTest {
   import sjest.JestSuiteContext.mutableContext
 
   val tests = Tests {
-    val impl = new JsTestContainer
     val suiteName = Random.genAlphanumeric(5)
+    val impl = new JsTestContainer(suiteName)
     val testName = Random.genAlphanumeric(20)
     "normal-behavior" - {
       assert(impl.getTests.isEmpty)
@@ -47,14 +47,15 @@ object JsTestContainerTest extends sjest.BaseSuite with PropertyTest {
       assert(content endsWith expectedContent)
     }
     "constraint-behavior" - {
+      val containerNullName = new JsTestContainer(null)
       intercept[IllegalStateException] {
-        impl.getSuiteName
+        containerNullName.getSuiteName
       }
       intercept[IllegalStateException] {
-        impl.getFilename
+        containerNullName.getFilename
       }
       intercept[IllegalArgumentException] {
-        impl.setSuiteName("bad name contains space")
+        containerNullName.setSuiteName("bad name contains space")
       }
     }
     "negative-duplicate-names" - {

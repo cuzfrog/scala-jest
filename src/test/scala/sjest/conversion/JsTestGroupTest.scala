@@ -10,8 +10,8 @@ object JsTestGroupTest extends sjest.BaseSuite {
   import sjest.JestSuiteContext.mutableContext
 
   val tests = Tests {
-    val mockTopGroup = new JsTestGroup()
     val suiteName = Random.genAlphanumeric(15) + "_suite"
+    val mockTopGroup = new JsTestGroup(suiteName)
     "clone-behavior" - {
       val cloneGroup = mockTopGroup.clone()
       val mockTestNames = (1 to Random.nextInt(30)).map { idx =>

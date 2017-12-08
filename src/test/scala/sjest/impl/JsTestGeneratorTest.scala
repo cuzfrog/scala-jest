@@ -25,13 +25,13 @@ object JsTestGeneratorTest extends sjest.BaseSuite with PropertyTest {
   val tests = Tests {
     val testName1 = Random.genAlphanumeric(20)
     val testName2 = Random.genAlphanumeric(20)
+    val suiteName = Random.genAlphanumeric(5)
     "test.js-generation" - {
       val mockTestCase = {
-        val jsTestContainer = new JsTestContainer
-        jsTestContainer.addTest(testName1, () => ())
-        jsTestContainer.addTest(testName2, () => println("make some noise"))
-        val randomName = Random.genAlphanumeric(5)
-        jsTestContainer.setSuiteName(randomName)
+        val container = new JsTestContainer(suiteName)
+        container.addTest(testName1, () => ())
+        container.addTest(testName2, () => println("make some noise"))
+        container//.setSuiteName(suiteName)
       }
 
       val path = impl.generateJsTest(mockTestCase)
@@ -43,7 +43,8 @@ object JsTestGeneratorTest extends sjest.BaseSuite with PropertyTest {
       val relativeOptJsPath = Path.relative(mockConfig.testJsDir, mockConfig.optJsPath)
       val expectedContent =
         s"""const out = require('$relativeOptJsPath');
-           |const loadTest = out.loadTest
+           |const loadTest = out.loadTest;
+           |const loadControl = out.loadControl;
            |
            |test('$testName1', () => {
            |  loadTest('${mockTestCase.getSuiteName}',['$testName1'])();
