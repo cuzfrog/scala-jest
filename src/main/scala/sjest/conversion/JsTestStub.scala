@@ -20,8 +20,8 @@ private object JsTestStub {
   }
 
   private def loadSuite(fqcn: String) = {
-    Reflect.lookupInstantiatableClass(fqcn) match {
-      case Some(moduleClass) => moduleClass.newInstance().asInstanceOf[JestSuite]
+    Reflect.lookupLoadableModuleClass(fqcn + "$") match {
+      case Some(moduleClass) => moduleClass.loadModule().asInstanceOf[JestSuite]
       case None => throw new ClassNotFoundException(fqcn)
     }
   }

@@ -2,34 +2,37 @@ package anywhere
 
 import sjest.JestSuite
 
-final class Test2 extends JestSuite {
+object Test2 extends JestSuite {
 
-  beforeAll{
-    println("--before all--")
+  var marker: Int = 0
+
+  beforeAll {
+    marker += 1
   }
 
-  beforeEach{
-    println("--before each--")
+  beforeEach {
+    marker += 1
   }
 
-  afterEach{
-    println("--after each--")
+  afterEach {
+    marker += 1
   }
 
-  afterAll{
-    println("--after all--")
+  afterAll {
+    println(marker)
   }
 
-  describe("outer1"){
-    describe("inner2"){
+  describe("outer1") {
+    describe("inner2") {
       test("test2-1") {
+        marker += 1
         println("do some test2-1!")
       }
     }
   }
 
   test("test2-2") {
+    marker += 1
     println("do some test2-2!")
   }
-
 }

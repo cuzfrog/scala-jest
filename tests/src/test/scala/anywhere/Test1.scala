@@ -2,7 +2,7 @@ package anywhere
 
 import org.scalajs.dom
 
-final class Test1 extends sjest.JestSuite {
+object Test1 extends sjest.JestSuite {
   test("this is my first test") {
     println("do some test1!")
     expect(1 + 2).toBe(3)

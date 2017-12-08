@@ -54,8 +54,8 @@ private object JestTask {
   @throws[IllegalArgumentException]("when suite load fails.")
   private def loadJestSuite(fqcn: String): JestSuite = {
     Try {
-      Reflect.lookupInstantiatableClass(fqcn) match {
-        case Some(clazz) => clazz.newInstance().asInstanceOf[JestSuite]
+      Reflect.lookupLoadableModuleClass(fqcn + "$") match {
+        case Some(scala_object) => scala_object.loadModule().asInstanceOf[JestSuite]
         case None => throw new ClassNotFoundException(fqcn)
       }
     } match {
