@@ -2,6 +2,8 @@ package sjest.impl
 
 import sjest.support.Stateless
 
+import scala.annotation.tailrec
+
 @Stateless
 private sealed trait JestOutputFilter extends Function1[String, String] {
   def apply(in: String): String
@@ -34,8 +36,9 @@ private final class JestOutputFilterDefaultImpl extends JestOutputFilter {
     filtered.mkString(NEWLINE)
   }
 
+  @tailrec
   private def removePrefixComma(line: String): String = {
-    if (line.startsWith(",")) line.drop(1)
+    if (line.startsWith(",")) removePrefixComma(line.drop(1))
     else line
   }
 }

@@ -32,7 +32,9 @@ abstract class JestFramework extends sbt.testing.Framework {
       this.testJsDir,
       this.nodejsCmd,
       this.autoRunTestInSbt,
-      this.jestOutputFilter
+      this.jestOutputFilter,
+      () => this.beforeGlobal(),
+      this.afterGlobal
     )
   }
 
@@ -56,6 +58,11 @@ abstract class JestFramework extends sbt.testing.Framework {
 
   /** Filter jest output in sbt console */
   protected def jestOutputFilter: String => String = defaultConfig.jestOutputFilter
+
+  /** Setup before run */
+  protected def beforeGlobal(): Any = defaultConfig.globalSetup()
+  /** Teardown after run */
+  protected def afterGlobal(setupStub: Any): Any = defaultConfig.globalTeardown(setupStub)
 }
 
 object JestFramework {
@@ -69,7 +76,9 @@ object JestFramework {
     nodejsCmdOfPath = (jsTestPath: String) =>
       NodejsCmd("node_modules/jest/bin/jest.js", js.Array("--colors", jsTestPath)),
     autoRunTestInSbt = true,
-    jestOutputFilter = Module.defaultJestOutputFilter
+    jestOutputFilter = Module.defaultJestOutputFilter,
+    globalSetup = () => (),
+    globalTeardown = Any => ()
   )
 }
 
@@ -77,4 +86,6 @@ private case class TestFrameworkConfig(optJsPath: String,
                                        testJsDir: String,
                                        nodejsCmdOfPath: String => JestFramework.NodejsCmd,
                                        autoRunTestInSbt: Boolean,
-                                       jestOutputFilter: String => String)
+                                       jestOutputFilter: String => String,
+                                       globalSetup: () => Any,
+                                       globalTeardown: Any => Any)

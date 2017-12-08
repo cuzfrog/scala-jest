@@ -101,7 +101,7 @@ _You can pass `jest` configs directly from console:_
 
 See more configs in [JestFramework](src/main/scala/sjest/JestFramework.scala)
 ```scala
-abstract class JestFramework{
+abstract class JestFramework {
   /** Yield test command, given a test.js file path. Jest configs can be put here. */
   protected def nodejsCmd(jsTestPath: String): NodejsCmd = (jsTestPath: String) =>
      NodejsCmd("node_modules/jest/bin/jest.js", js.Array("--colors", "--bail", jsTestPath))
@@ -114,6 +114,12 @@ abstract class JestFramework{
   
   /** Filter jest output in sbt console */
   protected def jestOutputFilter: String => String
+  
+  /** Setup before run */
+  protected def beforeGlobal(): Any
+  
+  /** Teardown after run */
+  protected def afterGlobal(): Any
 }
 ```
 

@@ -40,6 +40,8 @@ abstract class JestSuite extends JestApi {
     container.addControl(ControlType.AfterAll, () => block)
   }
 
+  protected final def updateGlobalSetupStub(stub: Any): Any = ???
+
   private[sjest] final def setSuiteName(fqcn: String): JsTestContainer = {
     container.setSuiteName(fqcn)
   }
