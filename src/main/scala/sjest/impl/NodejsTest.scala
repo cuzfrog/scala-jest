@@ -1,6 +1,7 @@
 package sjest.impl
 
 import sbt.testing.{Event, Logger, Status, TaskDef}
+import sjest.impl.JestRunner.Args
 import sjest.nodejs.{ChildProcess, ChildProcessOpt}
 import sjest.support.SideEffect
 import sjest.{JestFramework, TestFrameworkConfig}
@@ -12,7 +13,8 @@ private sealed trait NodejsTest {
   def runTest(jsTestPath: String, loggers: Array[Logger])(implicit taskDef: TaskDef): Event
 }
 
-private class NodejsTestImpl(jestOutputParser: JestOutputParser,
+private class NodejsTestImpl(consoleArgs: Args,
+                             jestOutputParser: JestOutputParser,
                              val testStatistics: TestStatistics)
                             (implicit config: TestFrameworkConfig) extends NodejsTest {
 
@@ -23,7 +25,7 @@ private class NodejsTestImpl(jestOutputParser: JestOutputParser,
     val event = try {
 
       val JestFramework.NodejsCmd(cmd, args) = config.nodejsCmdOfPath(jsTestPath)
-      val childProcess = ChildProcess.spawnSync(cmd, args) //run code with nodejs
+      val childProcess = ChildProcess.spawnSync(cmd, consoleArgs.combine(args)) //run code with nodejs
 
       val testEvent = this.resolveChildProcess(childProcess, loggers)
       testStatistics.nextTestSuite()

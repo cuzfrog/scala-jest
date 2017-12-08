@@ -32,11 +32,6 @@ private class JestRunner(_args: Args,
   }
 }
 
-private object JestRunner {
-  class Args(val args: Array[String]) extends AnyVal
-  class RemoteArgs(val args: Array[String]) extends AnyVal
-}
-
 private class JestSlaveRunner(_args: Args,
                               _remoteArgs: RemoteArgs,
                               taskFactory: TaskDef => Task,
@@ -48,5 +43,20 @@ private class JestSlaveRunner(_args: Args,
     val suites = testStatistics.getSuites.map(_.toJson).toJSArray
     communicationTunnel(js.JSON.stringify(suites))
     ""
+  }
+}
+
+private object JestRunner {
+  class Args(val args: Array[String]) extends JestRunnerArgs
+  class RemoteArgs(val args: Array[String]) extends JestRunnerArgs
+}
+
+private sealed trait JestRunnerArgs {
+
+  import js.JSConverters._
+
+  def args: Array[String]
+  def combine(more: js.Array[String]): js.Array[String] = {
+    (args.toJSArray ++ more).distinct
   }
 }
