@@ -1,12 +1,11 @@
 package sjest.nodejs
 
+import sjest.PackageCommon
 import utest._
 
 import scala.scalajs.js
 
-import sjest.NEWLINE
-
-object ChildProcessTest extends TestSuite {
+object ChildProcessTest extends TestSuite with PackageCommon{
   val tests = Tests {
     "spawnSync-basic" - {
       val childProcess = ChildProcess.spawnSync("echo", js.Array("value"))

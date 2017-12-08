@@ -3,7 +3,6 @@ package sjest.impl
 import sjest.support.{Service, Stateful}
 
 import scala.collection.mutable.ArrayBuffer
-import sjest.NEWLINE
 
 @Service
 @Stateful

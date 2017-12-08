@@ -5,8 +5,6 @@ import sjest.support.{MutableContext, Stateful, VisibleForTest}
 
 import scala.collection.mutable
 
-import sjest.NEWLINE
-
 @Stateful
 private final class JsTestGroup(val descr: Option[String] = None,
                                 val parent: Option[JsTestGroup] = None) extends JsTestTree {

@@ -2,7 +2,7 @@ package sjest.impl
 
 import sbt.testing.Logger
 import sjest.support.ThreadSafe
-import sjest.NEWLINE
+
 import scala.collection.mutable.ArrayBuffer
 
 @ThreadSafe

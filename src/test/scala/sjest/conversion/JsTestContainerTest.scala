@@ -1,6 +1,5 @@
 package sjest.conversion
 
-import sjest.impl.ExRandom
 import sjest.support.MutableContext
 import sjest.{JestSuite, PropertyTest}
 import utest._

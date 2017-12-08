@@ -5,7 +5,6 @@ import sjest.TestFrameworkConfig
 import sjest.conversion.JsTestContainer
 import sjest.nodejs.FSUtils
 import sjest.support.{SideEffect, Stateless}
-import sjest.NEWLINE
 
 @Stateless
 private sealed trait JsTestGenerator {
