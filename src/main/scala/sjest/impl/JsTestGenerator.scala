@@ -23,7 +23,8 @@ private final class JsTestGeneratorImpl(implicit config: TestFrameworkConfig)
   def generateJsTest(jsTestContainer: JsTestContainer): String = {
     val module =
       s"""const out = require('${this.resolveOptJsPath}');
-         |const loadTest = out.loadTest""".stripMargin
+         |const loadTest = out.loadTest;
+         |const loadControl = out.loadControl""".stripMargin
 
     val content = module + NEWLINE(2) + jsTestContainer.testContent
 

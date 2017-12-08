@@ -1,10 +1,11 @@
 package sjest
 
 import sbt.testing.TaskDef
-import sjest.conversion.JsTestContainer
+import sjest.conversion.{ControlType, JsTestContainer}
 import sjest.jest.JestApi
-import sjest.support.MutableContext
+import sjest.support.{MutableContext, VisibleForTest}
 
+import scala.scalajs.js
 import scala.scalajs.reflect.annotation.EnableReflectiveInstantiation
 
 @EnableReflectiveInstantiation
@@ -12,20 +13,37 @@ abstract class JestSuite extends JestApi {
 
   import JestSuiteContext.mutableContext
 
-  private[sjest] val jsTestContainer = new JsTestContainer
+  @VisibleForTest
+  private[sjest] val container = new JsTestContainer(this.getClass.getName)
 
   protected final def test[T](name: String)(block: => T): Unit = {
-    jsTestContainer.addTest(name, () => block)
+    container.addTest(name, () => block)
   }
 
   protected final def describe(description: String)(block: => Unit): Unit = {
-    jsTestContainer.enterDescribe(description)
+    container.enterDescribe(description)
     block
-    jsTestContainer.escapeDescribe()
+    container.escapeDescribe()
   }
 
-  private[sjest] final def getTestCase(taskDef: TaskDef): JsTestContainer = {
-    jsTestContainer.setSuiteName(taskDef.fullyQualifiedName())
+  protected final def beforeEach(block: => Any): Unit = {
+    container.addControl(ControlType.BeforeEach, () => block)
+  }
+
+  protected final def afterEach(block: => Any): Unit = {
+    container.addControl(ControlType.AfterEach, () => block)
+  }
+
+  protected final def beforeAll(block: => Any): Unit = {
+    container.addControl(ControlType.BeforeAll, () => block)
+  }
+
+  protected final def afterAll(block: => Any): Unit = {
+    container.addControl(ControlType.AfterAll, () => block)
+  }
+
+  private[sjest] final def setSuiteName(fqcn: String): JsTestContainer = {
+    container.setSuiteName(fqcn)
   }
 }
 

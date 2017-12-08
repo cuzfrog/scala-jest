@@ -3,17 +3,25 @@ package sjest.conversion
 import sjest.JestSuite
 import sjest.support.{MutableContext, Stateful, VisibleForTest}
 
-@Stateful
-private[sjest] final class JsTestContainer {
+import scala.collection.mutable
 
-  private[this] var suiteName: String = _
-  private[this] val testTree: JsTestGroup = new JsTestGroup //top group
+@Stateful
+private[sjest] final class JsTestContainer(private[this] var suiteName: String) {
+
+  private[this] val testTree: JsTestGroup = new JsTestGroup(suiteName) //top group
   private[this] var cursor: JsTestGroup = testTree
   private[this] var depth: Int = 0
+  private[this] val testControls: mutable.ArrayBuffer[JsControlCase] = mutable.ArrayBuffer.empty
 
   def addTest[T](name: String, testBlock: () => T)
                 (implicit mutableContext: MutableContext[JestSuite]): Unit = {
     cursor.addTest(name, testBlock)
+  }
+
+  def addControl[T](tpe: ControlType, block: () => T): Unit = {
+    if (testControls.exists(_.tpe == tpe))
+      throw new IllegalArgumentException(s"Multiple control '$tpe' defined in $suiteName")
+    testControls += JsControlCase(tpe, block)
   }
 
   def enterDescribe(description: String)
@@ -30,7 +38,8 @@ private[sjest] final class JsTestContainer {
 
   def testContent: String = {
     checkNameState()
-    testTree.toJsTest(Seq(this.suiteName))
+    val controls = testControls.map(_.toJsTest(this.suiteName))
+    (controls :+ testTree.toJsTest(Seq(this.suiteName))).mkString(NEWLINE)
   }
   private[conversion] def queryTestCase(paths: Seq[String]): JsTestCase = {
     checkDepth()
@@ -38,6 +47,10 @@ private[sjest] final class JsTestContainer {
       case Some(testCase: JsTestCase) => testCase
       case _ => throw new IllegalArgumentException(s"Cannot query test '${paths.last}' in '$suiteName'")
     }
+  }
+  private[conversion] def queryControlCase(tpe: ControlType): JsControlCase = {
+    testControls.find(_.tpe == tpe).getOrElse(
+      throw new IllegalArgumentException(s"No '$tpe' control for '$suiteName'"))
   }
 
   def setSuiteName(name: String)(implicit mutableContext: MutableContext[JestSuite]): this.type = {

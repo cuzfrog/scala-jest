@@ -9,9 +9,14 @@ package object conversion extends PackageCommon {
     def convert(t: T): R
   }
 
-  private[conversion] implicit class TreeConversionOps
+  private[conversion] implicit final class TreeConversionOps
   [T <: JsTestTree](t: T)
                    (implicit ev: Convertible[T, Seq[String] => String]) {
     def toJsTest(upperPath: Seq[String] = Seq.empty): String = ev.convert(t).apply(upperPath)
+  }
+
+  private[conversion] implicit final class ControlConversionOps
+  (c: JsControlCase)(implicit ev: Convertible[JsControlCase, String => String]) {
+    def toJsTest(fqcn: String): String = ev.convert(c).apply(fqcn)
   }
 }

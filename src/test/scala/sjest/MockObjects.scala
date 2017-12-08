@@ -27,5 +27,5 @@ private final class MockSuccessTest extends JestSuite {
     JsTestStubTest.sideEffectMarker += 1
   }
 
-  this.jsTestContainer.setSuiteName(this.getClass.getName)
+  this.container.setSuiteName(this.getClass.getName)
 }

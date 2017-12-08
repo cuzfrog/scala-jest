@@ -28,11 +28,11 @@ private[sjest] trait JestApi {
 
   protected final def assertions(num: Int): js.Object = JestGlobal.expect.assertions(num)
 
-  protected final def beforeEach(block: => Any): Unit = JestGlobal.beforeEach(() => block)
-
-  protected final def afterEach(block: => Any): Unit = JestGlobal.afterEach(() => block)
-
-  protected final def beforeAll(block: => Any): Unit = JestGlobal.beforeAll(() => block)
-
-  protected final def afterAll(block: => Any): Unit = JestGlobal.afterAll(() => block)
+//  protected final def beforeEach(block: => Any): Unit = JestGlobal.beforeEach(() => block)
+//
+//  protected final def afterEach(block: => Any): Unit = JestGlobal.afterEach(() => block)
+//
+//  protected final def beforeAll(block: => Any): Unit = JestGlobal.beforeAll(() => block)
+//
+//  protected final def afterAll(block: => Any): Unit = JestGlobal.afterAll(() => block)
 }

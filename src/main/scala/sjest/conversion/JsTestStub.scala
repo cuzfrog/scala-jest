@@ -9,10 +9,20 @@ import scala.scalajs.reflect.Reflect
 private object JsTestStub {
   @JSExportTopLevel("loadTest")
   def loadTest(fqcn: String, paths: js.Array[String]): js.Function = {
-    val testSuite = Reflect.lookupInstantiatableClass(fqcn) match {
+    loadSuite(fqcn).container.queryTestCase(paths).runBlock
+  }
+
+  @JSExportTopLevel("loadControl")
+  def loadControl(fqcn: String, tpe: String): js.Function = {
+    val controlType = ControlType.withName(tpe)
+    val controlCase = loadSuite(fqcn).container.queryControlCase(controlType)
+    controlCase.runBlock
+  }
+
+  private def loadSuite(fqcn: String) = {
+    Reflect.lookupInstantiatableClass(fqcn) match {
       case Some(moduleClass) => moduleClass.newInstance().asInstanceOf[JestSuite]
       case None => throw new ClassNotFoundException(fqcn)
     }
-    testSuite.jsTestContainer.queryTestCase(paths).runBlock
   }
 }

@@ -6,7 +6,8 @@ import sjest.support.{MutableContext, Stateful, VisibleForTest}
 import scala.collection.mutable
 
 @Stateful
-private final class JsTestGroup(val descr: Option[String] = None,
+private final class JsTestGroup(suiteName: String,
+                                val descr: Option[String] = None,
                                 val parent: Option[JsTestGroup] = None) extends JsTestTree { self =>
 
   private val subTrees: mutable.ArrayBuffer[JsTestTree] = mutable.ArrayBuffer.empty
@@ -14,14 +15,14 @@ private final class JsTestGroup(val descr: Option[String] = None,
   def addTest[T](name: String, testBlock: () => T)
                 (implicit mutableContext: MutableContext[JestSuite]): self.type = {
     if (subTrees.collectFirst { case testCase: JsTestCase if testCase.name == name => testCase }.nonEmpty)
-      throw new IllegalArgumentException(s"Duplicated test name: '$name'")
+      throw new IllegalArgumentException(s"Duplicated test name: '$name' in '$suiteName'")
     subTrees += JsTestCase(name, testBlock)
     self
   }
 
   def addDescribe(description: String)
                  (implicit mutableContext: MutableContext[JestSuite]): JsTestGroup = {
-    val child = new JsTestGroup(Some(description), Some(this))
+    val child = new JsTestGroup(suiteName, Some(description), Some(this))
     subTrees += child
     child
   }
@@ -44,7 +45,7 @@ private final class JsTestGroup(val descr: Option[String] = None,
       case group: JsTestGroup => group.clone()
       case testCase: JsTestCase => testCase
     }
-    val copy = new JsTestGroup(this.descr, this.parent)
+    val copy = new JsTestGroup(self.suiteName, self.descr, self.parent)
     copy.setTrees(subTreeCopy)
     copy
   }

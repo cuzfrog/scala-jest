@@ -35,9 +35,8 @@ private class JestTask(override val taskDef: TaskDef,
     implicit val _taskDef: TaskDef = taskDef
 
     val suite = JestTask.loadJestSuite(taskDef.fullyQualifiedName())
-
-    val jsTestContainer = suite.getTestCase(taskDef)
-    val jsTestPath = jsTestConverter.generateJsTest(jsTestContainer)
+    suite.setSuiteName(taskDef.fullyQualifiedName())
+    val jsTestPath = jsTestConverter.generateJsTest(suite.container)
 
     val event = if (config.autoRunTestInSbt) {
       nodejsTest.runTest(jsTestPath, loggers)
