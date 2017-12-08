@@ -5,7 +5,7 @@ import utest._
 
 import scala.util.Random
 
-object TestStatisticsTest extends TestSuite with PropertyTest {
+object TestStatisticsTest extends sjest.BaseSuite with PropertyTest {
 
   val tests = Tests {
     val impl = ModuleForTest().Prototype.testStatistics

@@ -5,7 +5,7 @@ import utest._
 
 import scala.util.Random
 
-object JsTestCaseTest extends TestSuite with PropertyTest {
+object JsTestCaseTest extends sjest.BaseSuite with PropertyTest {
   val tests = Tests {
     val mockCase = JsTestCase(Random.genAlphanumeric(10), () => ())
     "js.content" - {

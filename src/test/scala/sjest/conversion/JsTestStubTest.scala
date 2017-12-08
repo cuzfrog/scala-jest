@@ -5,7 +5,7 @@ import utest._
 
 import scala.scalajs.js
 
-object JsTestStubTest extends TestSuite {
+object JsTestStubTest extends sjest.BaseSuite {
 
   var sideEffectMarker: Int = 0
   private val classname = classOf[MockSuccessTest].getName

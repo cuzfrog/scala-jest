@@ -6,7 +6,7 @@ import utest._
 
 import scala.util.Random
 
-object FSUtilsTest extends TestSuite {
+object FSUtilsTest extends sjest.BaseSuite {
 
   private val randomPath = "/tmp/" + randomStr(5) + "/" + randomStr(5) + ".txt"
   private val expectedContent = Random.nextString(10000)

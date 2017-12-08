@@ -2,7 +2,7 @@ package sjest.impl
 
 import utest._
 
-object JestOutputParserTest extends TestSuite {
+object JestOutputParserTest extends sjest.BaseSuite {
 
   private val impl = ModuleForTest().Prototype.jestOutputParser
 

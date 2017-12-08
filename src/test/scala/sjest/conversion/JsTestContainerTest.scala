@@ -1,23 +1,23 @@
 package sjest.conversion
 
-import sjest.support.MutableContext
+import io.scalajs.nodejs.fs.Fs
+import sjest.impl.JsTestConverterTest.impl
 import sjest.{JestSuite, PropertyTest}
 import utest._
 
 import scala.scalajs.js
 import scala.util.Random
 
-object JsTestContainerTest extends TestSuite with PropertyTest {
+object JsTestContainerTest extends sjest.BaseSuite with PropertyTest {
 
-  private implicit val mutableContext: MutableContext[JestSuite] = new MutableContext[JestSuite] {}
+  import JestSuite.mutableContext
 
   val tests = Tests {
     val impl = new JsTestContainer
     val suiteName = Random.genAlphanumeric(5)
-
+    val testName = Random.genAlphanumeric(20)
     "normal-behavior" - {
       assert(impl.getTests.isEmpty)
-      val testName = Random.genAlphanumeric(20)
       val returnValue = Random.genAlphanumeric(40)
       impl.addTest(testName, () => returnValue)
       assert(impl.getTests.size == 1)
@@ -29,6 +29,24 @@ object JsTestContainerTest extends TestSuite with PropertyTest {
       impl.setSuiteName(suiteName)
       assert(impl.getSuiteName == suiteName)
       assert(impl.getFilename == suiteName + ".test.js")
+    }
+    "content" - {
+      val description = Random.genAlphanumeric(20)
+      val mockTestCase = {
+        impl.enterDescribe(description)
+        impl.addTest(testName, () => ())
+        impl.escapeDescribe()
+        impl.setSuiteName(suiteName)
+      }
+      val content = impl.testContent
+      val expectedContent =
+        s"""describe('$description', () => {
+           |test('$testName', () => {
+           |  loadTest(['${mockTestCase.getSuiteName}','$description','$testName'])();
+           |});
+           |});""".stripMargin
+
+      assert(content endsWith expectedContent)
     }
     "constraint-behavior" - {
       intercept[IllegalStateException] {

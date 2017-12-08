@@ -3,12 +3,12 @@ package sjest.impl
 import io.scalajs.nodejs.path.Path
 import sbt.testing.{Status, TaskDef}
 import sjest.nodejs.FSUtils
-import sjest.{MockObjects, TestFrameworkConfig}
+import sjest.{AddTestUtilities, MockObjects, TestFrameworkConfig}
 import utest._
 
 import scala.util.Random
 
-object NodejsTestImplTest extends TestSuite {
+object NodejsTestImplTest extends sjest.BaseSuite {
 
   private implicit val mockConfig: TestFrameworkConfig = MockObjects.mockConfig
   private implicit val taskDef: TaskDef = MockObjects.newTaskDef("test-taskDef")
@@ -58,7 +58,7 @@ object NodejsTestImplTest extends TestSuite {
 }
 
 private class MockJsTestFile(val failed: Int = 0, val passed: Int = 1)
-                            (implicit config: TestFrameworkConfig) {
+                            (implicit config: TestFrameworkConfig) extends AddTestUtilities{
   require(failed + passed > 0 && failed >= 0 && passed >= 0)
   val testName: String = "mock-test-" + Random.genAlphanumeric(10)
   val testDescription: String = Random.genAlphanumeric(20)

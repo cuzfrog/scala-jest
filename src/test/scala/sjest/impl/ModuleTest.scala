@@ -5,7 +5,7 @@ import utest._
 /**
  * To test scope and relationship between dependencies.
  */
-object ModuleTest extends TestSuite {
+object ModuleTest extends sjest.BaseSuite {
 
   import sjest.MockObjects.mockConfig
 

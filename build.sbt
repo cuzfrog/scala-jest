@@ -8,7 +8,7 @@ inThisBuild(Seq(
 ))
 
 val macros = project
-  .enablePlugins(ScalaJSPlugin)
+  .enablePlugins(ScalaJSPlugin).disablePlugins(JacocoPlugin)
   .settings(commonSettings)
   .settings(
     name := "sjest-macros",
@@ -33,7 +33,7 @@ val root = (project in file(".")).dependsOn(macros)
   )
 
 val tests = project.dependsOn(root)
-  .enablePlugins(ScalaJSPlugin)
+  .enablePlugins(ScalaJSPlugin).disablePlugins(JacocoPlugin)
   .settings(commonSettings)
   .settings(
     name := "sjest-tests",
@@ -47,6 +47,6 @@ val tests = project.dependsOn(root)
 onLoad in Global := {
   val insertCommand: State => State =
     (state: State) =>
-      state.copy(remainingCommands = ";root/tmpfsOn;tests/tmpfsOn" +: state.remainingCommands)
+      state.copy(remainingCommands = Exec(";root/tmpfsOn;tests/tmpfsOn",None) +: state.remainingCommands)
   (onLoad in Global).value andThen insertCommand
 }

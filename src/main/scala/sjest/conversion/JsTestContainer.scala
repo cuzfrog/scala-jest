@@ -28,7 +28,10 @@ private[sjest] final class JsTestContainer {
     depth -= 1
   }
 
-  def testContent: String = testTree.toJsTest()
+  def testContent: String = {
+    checkNameState()
+    testTree.toJsTest(Seq(this.suiteName))
+  }
   private[conversion] def queryTestCase(paths: Seq[String]): JsTestCase = {
     checkDepth()
     testTree.query(paths) match {

@@ -6,7 +6,7 @@ import utest.framework.Tree
 import scala.concurrent.{ExecutionContext, Future}
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
-trait PropertyTest extends TestSuite {
+trait PropertyTest extends sjest.BaseSuite {
   self: TestSuite =>
 
   protected def propertyTestRepeatTime: Int = 100

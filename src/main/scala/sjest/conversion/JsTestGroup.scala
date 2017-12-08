@@ -75,7 +75,7 @@ private object JsTestGroup {
     t.subTrees.map {
       case group: JsTestGroup =>
         val inner = recursiveConvertGroup(group, path)
-        wrapDescribe(t.descr, inner)
+        wrapDescribe(group.descr, inner)
       case testCase: JsTestCase => testCase.toJsTest(path)
     }.mkString(NEWLINE)
   }
@@ -84,7 +84,7 @@ private object JsTestGroup {
     if (descr.nonEmpty) {
       s"""describe('${descr.get}', () => {
          |$inner
-         |});"""
+         |});""".stripMargin
     }
     else inner
   }

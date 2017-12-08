@@ -5,7 +5,7 @@ import utest._
 
 import scala.scalajs.js
 
-object ChildProcessTest extends TestSuite with PackageCommon{
+object ChildProcessTest extends sjest.BaseSuite with PackageCommon{
   val tests = Tests {
     "spawnSync-basic" - {
       val childProcess = ChildProcess.spawnSync("echo", js.Array("value"))

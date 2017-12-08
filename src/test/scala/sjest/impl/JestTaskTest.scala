@@ -8,7 +8,7 @@ import sjest.MockObjects
 
 import scala.concurrent.Future
 
-object JestTaskTest extends TestSuite {
+object JestTaskTest extends sjest.BaseSuite {
 
   import MockObjects.mockSuccessTestFqcn
 
