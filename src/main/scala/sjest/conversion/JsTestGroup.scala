@@ -63,8 +63,8 @@ private final class JsTestGroup(val descr: Option[String] = None,
 }
 
 private object JsTestGroup {
-  implicit val conversion: JsTestConversion[JsTestGroup, Seq[String] => String] =
-    new JsTestConversion[JsTestGroup, Seq[String] => String] {
+  implicit val conversion: Convertible[JsTestGroup, Seq[String] => String] =
+    new Convertible[JsTestGroup, Seq[String] => String] {
       override def convert(t: JsTestGroup): Seq[String] => String = {
         recursiveConvertGroup(t, _)
       }
