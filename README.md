@@ -41,17 +41,12 @@ Add test framework to sbt:
 
 ### It's simple to use:
 
-Write your `jest` test in a class:
+Write dom test:
 
 ```scala
 import org.scalajs.dom
 
-final class Test1 extends sjest.JestSuite {
-  test("this is my first test") {
-    println("do some test1!")
-    expect(1 + 2).toBe(3)
-  }
-
+object MyTest extends sjest.JestSuite {
   test("this is a failed test") {
     expect(1 + 1).toBe(5)
   }
@@ -66,7 +61,41 @@ final class Test1 extends sjest.JestSuite {
 }
 ```
 
-You are good to go!
+Write test with shared variable:
+
+```scala
+object MyTestWithSharedVariable extends sjest.JestSuite{
+  private var marker: Int = 0
+
+  beforeEach {
+    marker += 1
+  }
+  
+  describe("outer1") {
+    describe("inner2") {
+      test("test2-1") {
+        marker += 1
+        println("do some test2-1!")
+      }
+    }
+    test("test2-3") {
+      marker += 1
+      println("do some test2-3!")
+    }
+  }
+    
+  afterAll {
+    println(marker) //4
+    //Note: assertion here is useless, error here simply gets ignored by jest.
+  }
+}
+```
+
+Then sbt `test` or `testOnly` like you do in any other scala test framework.
+
+_You can pass `jest` configs directly from console:_
+
+    test -- --bail --verbose
 
 ### More config:
 

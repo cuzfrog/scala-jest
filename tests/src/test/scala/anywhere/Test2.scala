@@ -19,7 +19,7 @@ object Test2 extends JestSuite {
   }
 
   afterAll {
-    println(marker)
+    println(marker) //9
   }
 
   describe("outer1") {
@@ -28,6 +28,9 @@ object Test2 extends JestSuite {
         marker += 1
         println("do some test2-1!")
       }
+    }
+    test("test2-3") {
+      println("do some test2-3!")
     }
   }
 

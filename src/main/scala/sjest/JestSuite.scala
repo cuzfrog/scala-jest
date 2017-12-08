@@ -1,11 +1,9 @@
 package sjest
 
-import sbt.testing.TaskDef
 import sjest.conversion.{ControlType, JsTestContainer}
 import sjest.jest.JestApi
 import sjest.support.{MutableContext, VisibleForTest}
 
-import scala.scalajs.js
 import scala.scalajs.reflect.annotation.EnableReflectiveInstantiation
 
 @EnableReflectiveInstantiation
