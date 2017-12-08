@@ -30,19 +30,24 @@ object JsTestContainerTest extends sjest.BaseSuite with PropertyTest {
     }
     "content" - {
       val description = Random.genAlphanumeric(20)
-      val mockTestCase = {
-        impl.enterDescribe(description)
-        impl.addTest(testName, () => ())
-        impl.escapeDescribe()
-        impl.setSuiteName(suiteName)
-      }
+      val controlTypes = ControlType.values.drop(Random.nextInt(ControlType.values.length + 1))
+
+      impl.enterDescribe(description)
+      impl.addTest(testName, () => ())
+      impl.escapeDescribe()
+      impl.setSuiteName(suiteName)
+      controlTypes.foreach(impl.addControl(_, () => ()))
+
       val content = impl.testContent
-      val expectedContent =
+
+      val controlCases = controlTypes.map(JsControlCase(_, () => ()))
+
+      val expectedContent = (controlCases.map(_.toJsTest(suiteName)) :+
         s"""describe('$description', () => {
            |test('$testName', () => {
-           |  loadTest('${mockTestCase.getSuiteName}',['$description','$testName'])();
+           |  loadTest('${impl.getSuiteName}',['$description','$testName'])();
            |});
-           |});""".stripMargin
+           |});""".stripMargin).mkString(NEWLINE)
 
       assert(content endsWith expectedContent)
     }
@@ -112,9 +117,24 @@ object JsTestContainerTest extends sjest.BaseSuite with PropertyTest {
       impl.enterDescribe("")
       intercept[IllegalStateException](impl.queryTestCase(Seq("")))
     }
+    "control-query" - {
+      val mockTpe = ControlType.values(Random.nextInt(ControlType.values.length))
+      val v = Random.genAlphanumeric(10)
+      impl.addControl(mockTpe, () => v)
+
+      val controlCase = impl.queryControlCase(mockTpe)
+      val expectedValue = controlCase.runBlock.apply()
+      assert(v == expectedValue)
+
+      val nonExistTypes = ControlType.values.filter(_ != mockTpe)
+      nonExistTypes.foreach { nonTpe =>
+        intercept[IllegalArgumentException](impl.queryControlCase(nonTpe))
+      }
+    }
   }
 
   override protected def propertyTestPathFilter: Seq[String] = Seq(
-    "constraint-behavior", "negative-duplicate-names", "nested-describe-query"
+    "constraint-behavior", "negative-duplicate-names", "nested-describe-query",
+    "bad-nested-describe"
   )
 }
