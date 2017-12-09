@@ -41,7 +41,8 @@ val tests = project.dependsOn(root)
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.4"
     ),
-    testFrameworks += new TestFramework("anywhere.MyTestFramework")
+    testFrameworks += new TestFramework("anywhere.MyTestFramework"),
+    scalaJSUseMainModuleInitializer in Test := true,
   )
 
 //mount tmpfs:

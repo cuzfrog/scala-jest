@@ -1,8 +1,8 @@
 package sjest.impl
 
 import sbt.testing.{Task, TaskDef}
-import sjest.TestFrameworkConfig
-import sjest.impl.JestRunner.{Args, GlobalSetupStub, RemoteArgs}
+import sjest.impl.JestRunner.{Args, RemoteArgs}
+import sjest.{GlobalStub, TestFrameworkConfig}
 
 import scala.scalajs.js
 
@@ -35,21 +35,20 @@ private class JestRunner(_args: Args,
   }
 }
 
-private class JestSlaveRunner(_args: Args,
-                              _remoteArgs: RemoteArgs,
-                              taskFactory: TaskDef => Task,
-                              testStatistics: TestStatistics,
-                              communicationTunnel: String => Unit)
-                             (implicit config: TestFrameworkConfig)
+private class JestSlaveRunner[S](_args: Args,
+                                 _remoteArgs: RemoteArgs,
+                                 taskFactory: TaskDef => Task,
+                                 testStatistics: TestStatistics,
+                                 globalStub: GlobalStub[S],
+                                 communicationTunnel: String => Unit)
+                                (implicit config: TestFrameworkConfig)
   extends JestRunner(_args, _remoteArgs, taskFactory, testStatistics) {
-
-  private val globalSetupStub = new GlobalSetupStub(config.globalSetup())
 
   override def done(): String = {
     import scalajs.js.JSConverters._
     val suites = testStatistics.getSuites.map(_.toJson).toJSArray
     communicationTunnel(js.JSON.stringify(suites))
-    config.globalTeardown(globalSetupStub.value)
+    globalStub.globalTeardown(globalStub.setupResult)
     ""
   }
 }
@@ -57,8 +56,6 @@ private class JestSlaveRunner(_args: Args,
 private object JestRunner {
   class Args(val args: Array[String]) extends JestRunnerArgs
   class RemoteArgs(val args: Array[String]) extends JestRunnerArgs
-
-  class GlobalSetupStub(val value:Any) extends AnyVal
 }
 
 private sealed trait JestRunnerArgs {

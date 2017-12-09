@@ -24,15 +24,3 @@ private final class MyTestFramework extends JestFramework {
     println(s"global marker after global, sig-${globalMarker.signature}, values:${globalMarker.values}")
   }
 }
-
-private class GlobalMarker {
-  val signature: Int = Random.nextInt(9999999)
-  println(s"GlobalMarker created, sig-$signature")
-  var assertMarker: Boolean = false
-  var values: mutable.ArrayBuffer[Int] = mutable.ArrayBuffer.empty
-
-  def mark(v: Int): Unit = {
-    if (v > 0) assertMarker = true
-    values += v
-  }
-}

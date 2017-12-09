@@ -15,14 +15,16 @@ abstract class JestFramework extends sbt.testing.Framework {
   override final def runner(args: Array[String],
                             remoteArgs: Array[String],
                             testClassLoader: ClassLoader): Runner = {
-    Module.init(args, remoteArgs).injectRunner
+    val globalSetupStub = GlobalStub(beforeGlobal(), afterGlobal)
+    Module.init(args, remoteArgs, globalSetupStub).injectRunner
   }
 
   override final def slaveRunner(args: Array[String],
                                  remoteArgs: Array[String],
                                  testClassLoader: ClassLoader,
                                  send: String => Unit): Runner = {
-    Module.init(args, remoteArgs, Some(send)).injectRunner
+    val globalSetupStub = GlobalStub(beforeGlobal(), afterGlobal)
+    Module.init(args, remoteArgs, globalSetupStub, Some(send)).injectRunner
     //note: master and slave are in two different applications, thus two Modules
   }
 
@@ -32,9 +34,7 @@ abstract class JestFramework extends sbt.testing.Framework {
       this.testJsDir,
       this.nodejsCmd,
       this.autoRunTestInSbt,
-      this.jestOutputFilter,
-      () => this.beforeGlobal(),
-      this.afterGlobal
+      this.jestOutputFilter
     )
   }
 
@@ -60,9 +60,9 @@ abstract class JestFramework extends sbt.testing.Framework {
   protected def jestOutputFilter: String => String = defaultConfig.jestOutputFilter
 
   /** Setup before run */
-  protected def beforeGlobal(): Any = defaultConfig.globalSetup()
+  protected def beforeGlobal(): Any = ()
   /** Teardown after run */
-  protected def afterGlobal(setupStub: Any): Any = defaultConfig.globalTeardown(setupStub)
+  protected def afterGlobal(stub: Any): Any = stub
 }
 
 object JestFramework {
@@ -76,16 +76,14 @@ object JestFramework {
     nodejsCmdOfPath = (jsTestPath: String) =>
       NodejsCmd("node_modules/jest/bin/jest.js", js.Array("--colors", jsTestPath)),
     autoRunTestInSbt = true,
-    jestOutputFilter = Module.defaultJestOutputFilter,
-    globalSetup = () => (),
-    globalTeardown = Any => ()
+    jestOutputFilter = Module.defaultJestOutputFilter
   )
 }
 
-private case class TestFrameworkConfig(optJsPath: String,
-                                       testJsDir: String,
-                                       nodejsCmdOfPath: String => JestFramework.NodejsCmd,
-                                       autoRunTestInSbt: Boolean,
-                                       jestOutputFilter: String => String,
-                                       globalSetup: () => Any,
-                                       globalTeardown: Any => Any)
+private final case class TestFrameworkConfig(optJsPath: String,
+                                             testJsDir: String,
+                                             nodejsCmdOfPath: String => JestFramework.NodejsCmd,
+                                             autoRunTestInSbt: Boolean,
+                                             jestOutputFilter: String => String)
+
+private final case class GlobalStub[S](setupResult: S, globalTeardown: S => Unit)

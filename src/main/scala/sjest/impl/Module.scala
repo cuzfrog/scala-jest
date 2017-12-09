@@ -5,27 +5,28 @@ import java.util.concurrent.atomic.AtomicReference
 import com.softwaremill.macwire._
 import sbt.testing.TaskDef
 import sjest.support.VisibleForTest
-import sjest.{TestFrameworkConfig, impl}
+import sjest.{GlobalStub, TestFrameworkConfig, impl}
 
 /**
  * One module per application.
  * Note: master and slave are in two different applications, thus two Modules
  */
 private[sjest] object Module {
-  private val moduleRef: AtomicReference[ImplementationModule] = new AtomicReference
+  private val moduleRef: AtomicReference[ImplementationModule[_]] = new AtomicReference
   @VisibleForTest
-  private[impl] def getModule: ImplementationModule = {
+  private[impl] def getModule: ImplementationModule[_] = {
     val module = moduleRef.get()
     if (module == null)
       throw new IllegalStateException("DI module not initiated.")
     module
   }
 
-  def init(args: Array[String] = Array.empty,
-           remoteArgs: Array[String] = Array.empty,
-           communicationTunnel: Option[String => Unit] = None)
-          (implicit config: TestFrameworkConfig): this.type = {
-    val newModule = new ImplementationModule(args, remoteArgs, communicationTunnel)
+  def init[S](args: Array[String] = Array.empty,
+              remoteArgs: Array[String] = Array.empty,
+              globalSetupStub: GlobalStub[S],
+              communicationTunnel: Option[String => Unit] = None)
+             (implicit config: TestFrameworkConfig): this.type = {
+    val newModule = new ImplementationModule(args, remoteArgs, globalSetupStub, communicationTunnel)
     if (!moduleRef.compareAndSet(null, newModule))
       throw new IllegalStateException("DI module can only be initiated once.")
     this
@@ -36,10 +37,11 @@ private[sjest] object Module {
   val defaultJestOutputFilter: String => String = JestOutputFilter.instance
 }
 
-private class ImplementationModule(args: Array[String],
-                                   remoteArgs: Array[String],
-                                   communicationTunnel: Option[String => Unit])
-                                  (implicit config: TestFrameworkConfig) {
+private class ImplementationModule[S](args: Array[String],
+                                      remoteArgs: Array[String],
+                                      globalSetupStub: GlobalStub[S],
+                                      communicationTunnel: Option[String => Unit])
+                                     (implicit config: TestFrameworkConfig) {
   final type TaskFactory = TaskDef => JestTask
   final type CommunicationTunnel = String => Unit
 
@@ -59,7 +61,7 @@ private class ImplementationModule(args: Array[String],
   final def jestRunner: JestRunner = {
     if (isSlave) {
       val send = communicationTunnel.get
-      wire[JestSlaveRunner]
+      wire[JestSlaveRunner[S]]
     } else wire[JestRunner]
   }
 }

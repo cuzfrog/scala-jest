@@ -12,8 +12,8 @@ Write `jest` tests as scala classes and run them within sbt without any hassle.
 
 Prerequisites:
 
-* nodejs (probably higher than v8.7.0) 
-* a `package.json`, or `npm init` to make one
+* `nodejs` (probably higher than v8.7.0) 
+* `package.json`, or `npm init` to make one
 * `npm install --save-dev jest`
 
 _See scala.js doc for file path conventions._
@@ -61,7 +61,7 @@ object MyTest extends sjest.JestSuite {
 }
 ```
 
-Write test with shared variable:
+Write test with shared local variable:
 
 ```scala
 object MyTestWithSharedVariable extends sjest.JestSuite{
@@ -114,21 +114,50 @@ abstract class JestFramework {
   
   /** Filter jest output in sbt console */
   protected def jestOutputFilter: String => String
-  
-  /** Setup before run */
-  protected def beforeGlobal(): Any
-  
-  /** Teardown after run */
-  protected def afterGlobal(): Any
 }
 ```
 
-### How it works?
+### Global life cycle:
+
+#### How sjest works?
 Scala-jest exposes client tests in `*opt.js`, and generates `*.test.js` files to call them,
 executed by nodejs' `child_process`, which then triggers [jest](https://facebook.github.io/jest).
 So scala.js is not involved the when testing is running, only the stdout/err shown in sbt console.
 
-A drawback is that file paths are not managed by sbt, and must be set manually.
+A problem is how to share objects/instances between these processes? Like:
+```scala
+object Global{
+  var shared_in_multiple_TestSuites = ??? //not working...
+}
+```
+The `Global` object is in limit scope as every test suite is executed in its own process.
+Unfortunately, `jest`ing all `*.test.js` at once is not working too.
+Something beyond `jest` needs to be introduced:
+
+Two ways have been tried:
+
+* Global stub. Pass a global object around and update it. The object must be serializable.
+[SerializeJsObject](https://stackoverflow.com/questions/8111446/turning-json-strings-into-objects-with-methods)
+* Global state. Use a redux/diode idiom, receive actions from test suites, and update the state.
+This seems more practical, thus adopted.
+
+#### Global state
+
+Communication between sub-processes is used to realize inter-test-suite sharing.
+This also brings the ability to do global setup/teardown.
+```scala
+abstract class JestFramework {
+  /** Setup before run */
+  protected def beforeGlobal(): Any = ()
+  /** Teardown after run */
+  protected def afterGlobal(stub: Any): Any = stub
+}
+```
+The result returned from `beforeGlobal` will be considered as a _stub_ and passed to each test suite.
+
+//todo
+
+
  
 ### About
  
