@@ -26,7 +26,26 @@ object Settings {
   )
 
   val publicationSettings = Seq(
-    publishTo := Some("My Bintray" at s"https://api.bintray.com/maven/cuzfrog/maven/${name.value }/;publish=1")
+    publishMavenStyle := true,
+    pomIncludeRepository := { _ => false },
+    publishTo := Some(
+      if (isSnapshot.value)
+        Opts.resolver.sonatypeSnapshots
+      else
+        Opts.resolver.sonatypeStaging
+    ),
+    scmInfo := Some(
+      ScmInfo(
+        url("https://github.com/cuzfrog/scala-jest"),
+        "scm:git@github.com:cuzfrog/scala-jest.git"
+      )
+    ),
+    developers := List(
+      Developer(id = "cuzfrog", name = "Cause Chung",
+        email = "cuzfrog@139.com", url = url("https://github.com/cuzfrog/"))
+    ),
+    licenses += ("Apache-2.0", url("https://opensource.org/licenses/Apache-2.0")),
+    homepage := Some(url("https://github.com/cuzfrog/scala-jest"))
   )
 
   val readmeVersionSettings = Seq(

@@ -1,0 +1,39 @@
+sudo: false
+
+language: scala
+
+jdk:
+  - oraclejdk8
+
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt
+    - node_modules
+
+install:
+  - . $HOME/.nvm/nvm.sh
+  - nvm install stable
+  - nvm use stable
+  - npm install
+
+script:
+  - npm install
+  - sbt -Dfile.encoding=UTF8 -J-XX:ReservedCodeCacheSize=256M -J-Xms1024M +test
+
+before_cache:
+  # Cleanup the cached directories to avoid unnecessary cache updates
+  - find $HOME/.ivy2/cache -name "ivydata-*.properties" -print -delete > /dev/null
+  - find $HOME/.sbt        -name "*.lock"               -print -delete > /dev/null
+
+before_deploy:
+  - openssl aes-256-cbc -K $encrypted_8fcf2ba0ac75_key -iv $encrypted_8fcf2ba0ac75_iv -in project/codesigning.asc.enc -out project/codesigning.asc -d
+  - cp project/credentials.sbt $HOME/.sbt/1.0/sonatype.sbt
+
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: sbt release
+  on:
+    all_branches: true
+    tags: true

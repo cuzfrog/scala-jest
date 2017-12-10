@@ -3,21 +3,21 @@ import Settings._
 inThisBuild(Seq(
   shellPrompt := { state => Project.extract(state).currentRef.project + "> " },
   scalaVersion := "2.12.4",
-  crossScalaVersions := Seq("2.11.11", "2.12.4"),
+  crossScalaVersions := Seq("2.12.4"), //"2.11.11" is not compatible with macwire
   version := "0.1.0-SNAPSHOT"
 ))
 
-val macros = project
-  .enablePlugins(ScalaJSPlugin)
-  .settings(commonSettings)
-  .settings(
-    name := "sjest-macros",
-    libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value
-    )
-  )
+//val macros = project
+//  .enablePlugins(ScalaJSPlugin)
+//  .settings(commonSettings)
+//  .settings(
+//    name := "sjest-macros",
+//    libraryDependencies ++= Seq(
+//      "org.scala-lang" % "scala-reflect" % scalaVersion.value
+//    )
+//  )
 
-val root = (project in file(".")).dependsOn(macros)
+val root = (project in file("."))
   .enablePlugins(ScalaJSPlugin)
   .settings(commonSettings, publicationSettings, readmeVersionSettings)
   .settings(
@@ -41,7 +41,8 @@ val tests = project.dependsOn(root)
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.4"
     ),
-    testFrameworks += new TestFramework("anywhere.MyTestFramework")
+    testFrameworks += new TestFramework("anywhere.MyTestFramework"),
+    testOptions += Tests.Argument()
   )
 
 //mount tmpfs:
@@ -51,3 +52,16 @@ onLoad in Global := {
       state.copy(remainingCommands = Exec(";root/tmpfsOn;tests/tmpfsOn", None) +: state.remainingCommands)
   (onLoad in Global).value andThen insertCommand
 }
+
+//release:
+import ReleaseTransformations._
+
+pgpReadOnly := false
+pgpSecretRing := baseDirectory.value / "project" / "codesigning.asc"
+pgpPassphrase := sys.env.get("PGP_PASS").map(_.toArray)
+releaseProcess := Seq[ReleaseStep](
+  checkSnapshotDependencies,
+  releaseStepCommand("pgp-cmd recv-key 895B79DB hkp://keyserver.ubuntu.com"),
+  releaseStepCommand("+publishSigned"),
+  releaseStepCommand("sonatypeReleaseAll")
+)

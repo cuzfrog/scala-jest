@@ -1,4 +1,6 @@
 # Scala-jest
+[![Build Status](https://travis-ci.org/cuzfrog/scala-jest.svg?branch=master)](https://travis-ci.org/cuzfrog/scala-jest)
+
 Write `jest` tests as scala classes and run them within sbt without any hassle.
 
 ### Motivation
@@ -20,7 +22,7 @@ _See scala.js doc for file path conventions._
 
 Dependency:
 
-    libraryDependencies += "com.github.cuzfrog" %%% "sjest" % "0.1.0-SNAPSHOT" Test
+    libraryDependencies += "com.github.cuzfrog" %%% "sjest" % "0.1.0-SNAPSHOT" % Test
 
 Provide test Framework(to specify client build info):
 

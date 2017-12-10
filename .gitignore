@@ -51,3 +51,6 @@ build.log
 
 #js
 node_modules/
+
+#pgp
+project/codesigning.asc
