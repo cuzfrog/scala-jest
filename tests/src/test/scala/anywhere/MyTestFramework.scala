@@ -2,9 +2,6 @@ package anywhere
 
 import sjest.JestFramework
 
-import scala.collection.mutable
-import scala.util.Random
-
 private final class MyTestFramework extends JestFramework {
   private val project = "tests"
   override protected def optJsPath = s"$project/target/scala-2.12/sjest-tests-test-fastopt.js"

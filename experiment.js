@@ -1,9 +1,9 @@
-var isWin = require('os').platform().indexOf('win') > -1;
-
-var where = isWin ? 'where' : 'whereis';
-
 var childProcess = require('child_process');
 
-var out = childProcess.spawnSync(where, ['lssdgasd']);
+var subProcess = childProcess.fork("target/subprocess.js");
 
-console.log(out.status);
+subProcess.on('message', (msg) => {
+  console.log('[experiment.js]received message: ', msg);
+});
+
+console.log('experiment executed')

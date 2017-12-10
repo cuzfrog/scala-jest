@@ -132,18 +132,10 @@ object Global{
 ```
 The `Global` object is in limit scope as every test suite is executed in its own process.
 Unfortunately, `jest`ing all `*.test.js` at once is not working too.
-Something beyond `jest` needs to be introduced:
-
-Two ways have been tried:
-
-* Global stub. Pass a global object around and update it. The object must be serializable.
-[SerializeJsObject](https://stackoverflow.com/questions/8111446/turning-json-strings-into-objects-with-methods)
-* Global state. Use a redux/diode idiom, receive actions from test suites, and update the state.
-This seems more practical, thus adopted.
 
 #### Global state
 
-Communication between sub-processes is used to realize inter-test-suite sharing.
+Communication between sub-processes is used to realize inter-test-suite sharing(not implemented yet).
 This also brings the ability to do global setup/teardown.
 ```scala
 abstract class JestFramework {
@@ -153,11 +145,7 @@ abstract class JestFramework {
   protected def afterGlobal(stub: Any): Any = stub
 }
 ```
-The result returned from `beforeGlobal` will be considered as a _stub_ and passed to each test suite.
-
-//todo
-
-
+The result returned from `beforeGlobal` will be passed as a _stub_ to `afterGlobal`.
  
 ### About
  

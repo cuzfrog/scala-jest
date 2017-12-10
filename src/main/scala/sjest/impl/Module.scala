@@ -23,10 +23,11 @@ private[sjest] object Module {
 
   def init[S](args: Array[String] = Array.empty,
               remoteArgs: Array[String] = Array.empty,
-              globalSetupStub: GlobalStub[S],
+              globalStubOpt: Option[GlobalStub[S]] = None,
               communicationTunnel: Option[String => Unit] = None)
              (implicit config: TestFrameworkConfig): this.type = {
-    val newModule = new ImplementationModule(args, remoteArgs, globalSetupStub, communicationTunnel)
+    val globalStub = globalStubOpt.getOrElse(GlobalStub.dummyGlobalStub)
+    val newModule = new ImplementationModule(args, remoteArgs, globalStub, communicationTunnel)
     if (!moduleRef.compareAndSet(null, newModule))
       throw new IllegalStateException("DI module can only be initiated once.")
     this
@@ -34,19 +35,22 @@ private[sjest] object Module {
 
   def injectRunner: sbt.testing.Runner = getModule.jestRunner
 
-  val defaultJestOutputFilter: String => String = JestOutputFilter.instance
+  def defaultJestOutputFilter: String => String = JestOutputFilter.instance
+
+  /** Send message to master. */
+  def send(msg:String):Unit = getModule.communicationTunnel.foreach(_.apply(msg))
 }
 
 private class ImplementationModule[S](args: Array[String],
                                       remoteArgs: Array[String],
                                       globalSetupStub: GlobalStub[S],
-                                      communicationTunnel: Option[String => Unit])
+                                      val communicationTunnel: Option[String => Unit])
                                      (implicit config: TestFrameworkConfig) {
   final type TaskFactory = TaskDef => JestTask
   final type CommunicationTunnel = String => Unit
 
-  private def jestRunnerArgs: JestRunner.Args = new JestRunner.Args(args)
-  private def jestRunnerRemoteArgs: JestRunner.RemoteArgs = new impl.JestRunner.RemoteArgs(args)
+  protected def jestRunnerArgs: JestRunner.Args = new JestRunner.Args(args)
+  protected def jestRunnerRemoteArgs: JestRunner.RemoteArgs = new impl.JestRunner.RemoteArgs(args)
   final def isSlave: Boolean = communicationTunnel.isDefined
 
   // ------ Singletons ------

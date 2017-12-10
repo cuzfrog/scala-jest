@@ -2,9 +2,8 @@ package sjest
 
 import sjest.conversion.{ControlType, JsTestContainer}
 import sjest.jest.JestApi
-import sjest.support.{MutableContext, VisibleForTest}
+import sjest.support.MutableContext
 
-import scala.collection.mutable
 import scala.scalajs.reflect.annotation.EnableReflectiveInstantiation
 
 @EnableReflectiveInstantiation
@@ -39,16 +38,15 @@ abstract class JestSuite extends JestApi {
   protected final def afterAll(block: => Any): Unit = {
     container.addControl(ControlType.AfterAll, () => block)
   }
-
 }
 
-trait GlobalStubAccess[S]{
-  self:JestSuite =>
-  // ---------- Jest Api (Global stub overloading) -----------
-  protected final def test[T](name: String)(block: S => T): Unit = {
-    //container.addTest(name, block)
-  }
-}
+//trait GlobalStubAccess[S]{
+//  self:JestSuite =>
+//  // ---------- Jest Api (Global stub overloading) -----------
+//  protected final def test[T](name: String)(block: S => T): Unit = {
+//    //container.addTest(name, block)
+//  }
+//}
 
 private object JestSuiteContext {
   implicit val mutableContext: MutableContext[JestSuite] = new MutableContext[JestSuite] {}

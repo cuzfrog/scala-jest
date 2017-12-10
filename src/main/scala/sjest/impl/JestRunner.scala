@@ -5,6 +5,7 @@ import sjest.impl.JestRunner.{Args, RemoteArgs}
 import sjest.{GlobalStub, TestFrameworkConfig}
 
 import scala.scalajs.js
+import scala.scalajs.js.JSON
 
 private class JestRunner(_args: Args,
                          _remoteArgs: RemoteArgs,
@@ -21,8 +22,15 @@ private class JestRunner(_args: Args,
   }
 
   override def receiveMessage(msg: String): Option[String] = {
-    val suites = js.JSON.parse(msg).asInstanceOf[js.Array[String]].map(TestCaseResult.fromJson)
-    testStatistics.addSuites(suites)
+    val runnerMessage = JSON.parse(msg).asInstanceOf[RunnerMessage]
+    runnerMessage.tpe match {
+      case RunnerMessage.Type.TestStatistics =>
+        val suites = runnerMessage.payload.asInstanceOf[js.Array[String]].map(TestCaseResult.fromJson)
+        testStatistics.addSuites(suites)
+      case _ =>
+        throw new UnsupportedOperationException(s"Master received: ${runnerMessage.payload}")
+    }
+
     //no message sent back to slave
     None
   }
@@ -40,14 +48,14 @@ private class JestSlaveRunner[S](_args: Args,
                                  taskFactory: TaskDef => Task,
                                  testStatistics: TestStatistics,
                                  globalStub: GlobalStub[S],
-                                 communicationTunnel: String => Unit)
+                                 sendToMaster: String => Unit)
                                 (implicit config: TestFrameworkConfig)
   extends JestRunner(_args, _remoteArgs, taskFactory, testStatistics) {
 
   override def done(): String = {
     import scalajs.js.JSConverters._
     val suites = testStatistics.getSuites.map(_.toJson).toJSArray
-    communicationTunnel(js.JSON.stringify(suites))
+    sendToMaster(JSON.stringify(new RunnerMessage(RunnerMessage.Type.TestStatistics, suites)))
     globalStub.globalTeardown(globalStub.setupResult)
     ""
   }
@@ -56,6 +64,13 @@ private class JestSlaveRunner[S](_args: Args,
 private object JestRunner {
   class Args(val args: Array[String]) extends JestRunnerArgs
   class RemoteArgs(val args: Array[String]) extends JestRunnerArgs
+}
+
+private class RunnerMessage(val tpe: String, val payload: js.Object) extends js.Object
+private object RunnerMessage {
+  object Type {
+    val TestStatistics: String = "TestStatistics"
+  }
 }
 
 private sealed trait JestRunnerArgs {

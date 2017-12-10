@@ -2,14 +2,13 @@ package sjest.impl
 
 import io.scalajs.nodejs.fs.Fs
 import sbt.testing._
-import sjest.support.VisibleForTest
+import sjest.support.{Utils, VisibleForTest}
 import sjest.{JestSuite, TestFrameworkConfig}
 
-import scala.scalajs.reflect.Reflect
 import scala.util.{Failure, Success, Try}
 
 private class JestTask(override val taskDef: TaskDef,
-                       jsTestConverter: JsTestGenerator,
+                       jsTestGenerator: JsTestGenerator,
                        nodejsTest: NodejsTest)
                       (implicit config: TestFrameworkConfig) extends sbt.testing.Task {
   override def tags(): Array[String] = Array("jest-test-task")
@@ -36,7 +35,7 @@ private class JestTask(override val taskDef: TaskDef,
 
     val suite = JestTask.loadJestSuite(taskDef.fullyQualifiedName())
     suite.setSuiteName(taskDef.fullyQualifiedName())
-    val jsTestPath = jsTestConverter.generateJsTest(suite.container)
+    val jsTestPath = jsTestGenerator.generateJsTest(suite.container)
 
     val event = if (config.autoRunTestInSbt) {
       nodejsTest.runTest(jsTestPath, loggers)
@@ -54,10 +53,7 @@ private object JestTask {
   @throws[IllegalArgumentException]("when suite load fails.")
   private def loadJestSuite(fqcn: String): JestSuite = {
     Try {
-      Reflect.lookupLoadableModuleClass(fqcn + "$") match {
-        case Some(scala_object) => scala_object.loadModule().asInstanceOf[JestSuite]
-        case None => throw new ClassNotFoundException(fqcn)
-      }
+      Utils.loadModule[JestSuite](fqcn)
     } match {
       case Success(suite) => suite
       case Failure(t) =>

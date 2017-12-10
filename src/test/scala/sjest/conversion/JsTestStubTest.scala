@@ -8,7 +8,7 @@ import scala.scalajs.js
 object JsTestStubTest extends sjest.BaseSuite {
 
   var sideEffectMarker: Int = 0
-  private val classname = classOf[MockSuccessTest].getName
+  private val classname = MockSuccessTest.getClass.getName
 
   val tests = Tests {
     "loadTest-positive" - {

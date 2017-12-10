@@ -32,7 +32,7 @@ private class NodejsTestImpl(consoleArgs: Args,
       testEvent
     } catch {
       case NonFatal(t) =>
-        loggers.error(s"Test failed: ${fansi.Color.Red(t.toString)}")
+        loggers.error(s"Test failed: ${fansi.Color.Red(t.getClass.getName)}:${t.getMessage}")
         loggers.error(t.getStackTrace.mkString(NEWLINE))
         JestTestEvent(Status.Failure)
     }

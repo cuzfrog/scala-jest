@@ -15,16 +15,14 @@ abstract class JestFramework extends sbt.testing.Framework {
   override final def runner(args: Array[String],
                             remoteArgs: Array[String],
                             testClassLoader: ClassLoader): Runner = {
-    val globalSetupStub = GlobalStub(beforeGlobal(), afterGlobal)
-    Module.init(args, remoteArgs, globalSetupStub).injectRunner
+    Module.init(args, remoteArgs, assembleGlobalStub).injectRunner
   }
 
   override final def slaveRunner(args: Array[String],
                                  remoteArgs: Array[String],
                                  testClassLoader: ClassLoader,
                                  send: String => Unit): Runner = {
-    val globalSetupStub = GlobalStub(beforeGlobal(), afterGlobal)
-    Module.init(args, remoteArgs, globalSetupStub, Some(send)).injectRunner
+    Module.init(args, remoteArgs, assembleGlobalStub, Some(send)).injectRunner
     //note: master and slave are in two different applications, thus two Modules
   }
 
@@ -37,6 +35,7 @@ abstract class JestFramework extends sbt.testing.Framework {
       this.jestOutputFilter
     )
   }
+  private final def assembleGlobalStub = Some(GlobalStub(beforeGlobal(), afterGlobal))
 
   //------------------ client custom api -------------------
   import JestFramework.defaultConfig
@@ -61,7 +60,7 @@ abstract class JestFramework extends sbt.testing.Framework {
 
   /** Setup before run */
   protected def beforeGlobal(): Any = ()
-  /** Teardown after run */
+  /** Teardown after run. The stub is returned from `beforeGlobal()` */
   protected def afterGlobal(stub: Any): Any = stub
 }
 
@@ -87,3 +86,6 @@ private final case class TestFrameworkConfig(optJsPath: String,
                                              jestOutputFilter: String => String)
 
 private final case class GlobalStub[S](setupResult: S, globalTeardown: S => Unit)
+private object GlobalStub{
+  val dummyGlobalStub: GlobalStub[Unit] = GlobalStub[Unit]((), _ => ())
+}

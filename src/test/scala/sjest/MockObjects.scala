@@ -9,7 +9,7 @@ private object MockObjects {
     testJsDir = "target/tmp/jests/"
   )
 
-  def newTaskDef(fqcn: String = "sjest.MockSuccessTest"): TaskDef =
+  def newTaskDef(fqcn: String = mockSuccessTestFqcn): TaskDef =
     new TaskDef(
       _fullyQualifiedName = fqcn,
       _fingerprint = new JestFingerprint,
@@ -17,15 +17,18 @@ private object MockObjects {
       _selectors = Array(new SuiteSelector)
     )
 
-  val mockSuccessTestFqcn: String = classOf[MockSuccessTest].getName
+  val mockSuccessTestFqcn: String = MockSuccessTest.suiteName
 }
 
-private final class MockSuccessTest extends JestSuite {
+private object MockSuccessTest extends JestSuite {
   import JestSuiteContext.mutableContext
 
   test("mock test") {
     JsTestStubTest.sideEffectMarker += 1
   }
 
-  this.container.setSuiteName(this.getClass.getName)
+
+  val suiteName =
+    if(getClass.getName.endsWith("$")) getClass.getName.dropRight(1) else getClass.getName
+  this.container.setSuiteName(suiteName)
 }

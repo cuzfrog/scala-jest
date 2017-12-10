@@ -13,7 +13,8 @@ object Settings {
     scalacOptions ++= Seq(
       "-unchecked",
       "-deprecation",
-      "-feature"),
+      "-feature",
+      "-P:scalajs:sjsDefinedByDefault"),
     libraryDependencies ++= Seq(
 
     ),
