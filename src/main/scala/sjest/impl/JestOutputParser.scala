@@ -4,23 +4,23 @@ import com.sun.istack.internal.Nullable
 import sjest.support.Stateless
 
 @Stateless
-private sealed trait JestOutputParser extends Function1[String, TestCaseResult] {
+private sealed trait JestOutputParser extends Function1[String, Option[TestCaseResult]] {
   /**
    * Extract test statistics info and update the TestStatistics
    */
   @throws[IllegalArgumentException]
-  def extractStatistics(jestOutput: String): TestCaseResult
+  def extractStatistics(jestOutput: String): Option[TestCaseResult]
 
   @deprecated("Do not use apply, use extractStatistics explicitly", "intentional")
   @throws[IllegalArgumentException]
-  def apply(jestOutput: String): TestCaseResult = extractStatistics(jestOutput)
+  def apply(jestOutput: String): Option[TestCaseResult] = extractStatistics(jestOutput)
 }
 
 private final class JestOutputParserImpl extends JestOutputParser {
 
   import JestOutputParserImpl._
 
-  override def extractStatistics(jestOutput: String): TestCaseResult = {
+  override def extractStatistics(jestOutput: String): Option[TestCaseResult] = {
     val lines = extractLines(jestOutput)
     extractTestResult(lines)
   }
@@ -34,22 +34,18 @@ private object JestOutputParserImpl {
     val lines = qualifiedLines.collect {
       case line if line.startsWith("Tests:") => line.replaceAll("""\s""", "")
     }
-    require(lines.lengthCompare(0) > 0,
-      s"Cannot extract test result from jest output:$NEWLINE$jestOutput")
     lines
   }
 
   private final val ResultExtractor = """Tests:(\d+failed,)?(\d+passed,)?(\d+of)?\d+total""".r
   //contract: lines.size>0
-  private def extractTestResult(lines: Seq[String]): TestCaseResult = {
-    val resultOpt = lines.collectFirst {
+  private def extractTestResult(lines: Seq[String]): Option[TestCaseResult] = {
+    lines.collectFirst {
       case ResultExtractor(failedStr, passedStr, _) =>
         val failed = extractNum(failedStr)
         val passed = extractNum(passedStr)
         TestCaseResult(failed, passed)
     }
-    resultOpt.getOrElse(throw new IllegalArgumentException(
-      ("Cannot parse test result from jest output:" +: lines).mkString(NEWLINE)))
   }
 
   private final val NumberExtractor = """(\d+)[a-zA-Z]+,""".r

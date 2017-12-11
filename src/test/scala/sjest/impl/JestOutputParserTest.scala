@@ -24,7 +24,7 @@ object JestOutputParserTest extends sjest.BaseSuite {
 
       val result = impl.extractStatistics(mockOutput)
       val expected = TestCaseResult(0, 3)
-      assert(result == expected)
+      assert(result contains expected)
     }
     "positive-failed+passed" - {
       val mockOutput =
@@ -34,7 +34,7 @@ object JestOutputParserTest extends sjest.BaseSuite {
           |""".stripMargin
       val result = impl.extractStatistics(mockOutput)
       val expected = TestCaseResult(15, 1)
-      assert(result == expected)
+      assert(result contains expected)
     }
     "positive-failed" - {
       val mockOutput =
@@ -43,22 +43,20 @@ object JestOutputParserTest extends sjest.BaseSuite {
           |""".stripMargin
       val result = impl.extractStatistics(mockOutput)
       val expected = TestCaseResult(15, 0)
-      assert(result == expected)
+      assert(result contains expected)
     }
     "negative-bad-format" - {
       val mockOutput =
         """Test Suites: 1 failed, 1 total
           |Tests:  bad format
           |""".stripMargin
-      intercept[IllegalArgumentException] {
-        impl.extractStatistics(mockOutput)
-      }
+      val result = impl.extractStatistics(mockOutput)
+      assert(result.isEmpty)
     }
     "negative-empty" - {
       val mockOutput = ""
-      intercept[IllegalArgumentException] {
-        impl.extractStatistics(mockOutput)
-      }
+      val result = impl.extractStatistics(mockOutput)
+      assert(result.isEmpty)
     }
   }
 }

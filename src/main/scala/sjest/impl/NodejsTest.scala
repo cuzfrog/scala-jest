@@ -28,7 +28,6 @@ private class NodejsTestImpl(consoleArgs: Args,
       val childProcess = ChildProcess.spawnSync(cmd, consoleArgs.combine(args)) //run code with nodejs
 
       val testEvent = this.resolveChildProcess(childProcess, loggers)
-      testStatistics.nextTestSuite()
       testEvent
     } catch {
       case NonFatal(t) =>
@@ -55,13 +54,19 @@ private class NodejsTestImpl(consoleArgs: Args,
         output.map(config.jestOutputFilter).foreach(loggers.error)
         (Status.Failure, output)
     }
-    outputOpt.foreach(this.jestOutputParser andThen this.countTestResult)
+    outputOpt.foreach(this.countTestResult(_, status))
+    testStatistics.nextTestSuite()
     JestTestEvent(status)
   }
 
   @SideEffect(testStatistics)
-  private def countTestResult(testCaseResult: TestCaseResult): Unit = {
-    testStatistics.incrementPassedTest(testCaseResult.passed)
-    testStatistics.incrementFailedTest(testCaseResult.failed)
+  private def countTestResult(output: String,
+                              status: Status): Unit = {
+    this.jestOutputParser.extractStatistics(output) match {
+      case Some(testCaseResult) =>
+        testStatistics.incrementPassedTest(testCaseResult.passed)
+        testStatistics.incrementFailedTest(testCaseResult.failed)
+      case None => if (status == Status.Failure) testStatistics.incrementFailedTest()
+    }
   }
 }
