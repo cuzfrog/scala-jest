@@ -8,7 +8,7 @@ import scala.util.Random
 
 object JsTestContainerTest extends sjest.BaseSuite with PropertyTest {
 
-  import sjest.JestSuiteContext.mutableContext
+  import sjest.MutableContexts.jestSuiteContext
 
   val tests = Tests {
     val suiteName = Random.genAlphanumeric(5)
@@ -18,7 +18,7 @@ object JsTestContainerTest extends sjest.BaseSuite with PropertyTest {
       assert(impl.getTests.isEmpty)
       val returnValue = Random.genAlphanumeric(40)
       impl.addTest(testName, () => returnValue)
-      assert(impl.getTests.size == 1)
+      assert(impl.getTests.lengthCompare(1) == 0)
       val test = impl.getTests.head
       assert(test.name == testName)
       val runBlock = test.runBlock.asInstanceOf[js.Function0[String]]

@@ -2,12 +2,11 @@ package sjest.conversion
 
 import utest._
 
-import scala.collection.mutable
 import scala.util.Random
 
 object JsTestGroupTest extends sjest.BaseSuite {
 
-  import sjest.JestSuiteContext.mutableContext
+  import sjest.MutableContexts.jestSuiteContext
 
   val tests = Tests {
     val suiteName = Random.genAlphanumeric(15) + "_suite"

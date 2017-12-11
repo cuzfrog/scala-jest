@@ -3,11 +3,12 @@ import sbt._
 import MyTasks._
 import com.github.cuzfrog.sbttmpfs.SbtTmpfsPlugin.autoImport._
 import org.scalajs.sbtplugin.ScalaJSPlugin.AutoImport._
+import com.typesafe.sbt.pgp.PgpKeys._
 
 object Settings {
   val commonSettings = Seq(
     resolvers ++= Seq(
-      Resolver.bintrayRepo("cuzfrog","maven")
+      Resolver.bintrayRepo("cuzfrog", "maven")
     ),
     organization := "com.github.cuzfrog",
     scalacOptions ++= Seq(
@@ -26,13 +27,13 @@ object Settings {
   )
 
   val publicationSettings = Seq(
+    publishConfiguration := withOverwrite(publishConfiguration.value, isSnapshot.value),
+    publishSignedConfiguration := withOverwrite(publishSignedConfiguration.value, isSnapshot.value),
     publishMavenStyle := true,
     pomIncludeRepository := { _ => false },
     publishTo := Some(
-      if (isSnapshot.value)
-        Opts.resolver.sonatypeSnapshots
-      else
-        Opts.resolver.sonatypeStaging
+      if (isSnapshot.value) Opts.resolver.sonatypeSnapshots
+      else Opts.resolver.sonatypeStaging
     ),
     scmInfo := Some(
       ScmInfo(
@@ -57,4 +58,8 @@ object Settings {
       IO.write(file("README.md"), newContents)
     }
   )
+
+  private def withOverwrite(config: PublishConfiguration, isSnapshot: Boolean) = {
+    config.withOverwrite(isSnapshot)
+  }
 }

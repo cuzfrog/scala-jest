@@ -21,7 +21,7 @@ private object MockObjects {
 }
 
 private object MockSuccessTest extends JestSuite {
-  import JestSuiteContext.mutableContext
+  import MutableContexts.jestSuiteContext
 
   test("mock test") {
     JsTestStubTest.sideEffectMarker += 1

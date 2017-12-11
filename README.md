@@ -4,6 +4,8 @@
 
 Write `jest` tests as scala classes and run them within sbt without any hassle.
 
+Build against scala-2.12 and scalajs-0.6.21.
+
 ### Motivation
 * To workaround scala.js issue [#2635](https://github.com/scala-js/scala-js/issues/2635).
 * To provide a better test ability against nodejs + jsdom + CommonJS on scala.js.
@@ -26,16 +28,14 @@ Dependency:
     libraryDependencies += "com.github.cuzfrog" %%% "sjest" % "0.1.0-SNAPSHOT" % Test
 
 Provide test Framework(to specify client build info):
-
 ```scala
-val myTestFramework: TestFramework = new TestFramework("anywhere.MyTestFramework")
+val myTestFramework: TestFramework = new TestFramework("sjest.JestFramework")
 testFrameworks += myTestFramework
-testOptions += Tests.Argument(myTestFramework, s"-opt.js.path:${(artifactPath in Test in fastOptJS).value}")
+testOptions += Tests.Argument(myTestFramework,
+  s"-opt.js.path:${(artifactPath in Test in fastOptJS).value}")
 ```
-
-Add test framework to sbt:
-
-    testFrameworks += new TestFramework("your.package.MyTestFramework")
+Scala-jest has to know where the `*.opt.js` file is.
+This can also be set through overriding `optJsPath` in `JestFramework` (see below).
 
 ### It's simple to use:
 
@@ -99,9 +99,9 @@ _You can pass `jest` configs directly from console:_
 
 See more configs in [JestFramework](src/main/scala/sjest/JestFramework.scala)
 ```scala
-abstract class JestFramework {
+class JestFramework {
   /** *opt.js full path or path relative to sbt root dir. This is prior to args */
-  protected def optJsPath: String
+  protected def optJsPath: String = ""
   /** Generated *.test.js full path or path relative to sbt root dir. */
   protected def testJsDir: String = "./target/scala-jests/"
 
@@ -109,14 +109,14 @@ abstract class JestFramework {
   protected def nodejsCmd(jsTestPath: String): NodejsCmd = (jsTestPath: String) =>
      NodejsCmd("node_modules/jest/bin/jest.js", js.Array("--colors", "--bail", jsTestPath))
   
-  /** Whether to run actual test by `'sbt test'`. <br>
+  /** Whether to run actual test by `'sbt test'`.
    * 'jest xx.test.js' is executed for every test, thus worse performance.
    * One could disable it by set this to false, and manually run jest from command line.
    */
   protected def autoRunTestInSbt: Boolean = true
   
   /** Filter jest output in sbt console */
-  protected def jestOutputFilter: String => String
+  protected def jestOutputFilter: String => String = defaultFilter
 }
 ```
 
@@ -141,7 +141,7 @@ Unfortunately, `jest`ing all `*.test.js` at once is not working too.
 Communication between sub-processes is used to realize inter-test-suite sharing(not implemented yet).
 This also brings the ability to do global setup/teardown.
 ```scala
-abstract class JestFramework {
+class JestFramework {
   /** Setup before run */
   protected def beforeGlobal(): Any = ()
   /** Teardown after run */
