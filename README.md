@@ -28,14 +28,9 @@ Dependency:
 Provide test Framework(to specify client build info):
 
 ```scala
-import sjest.JestFramework
-private final class MyTestFramework extends JestFramework {
-  private val project = "tests"
-  //where the *opt.js file is:
-  override protected def optJsPath = s"$project/target/scala-2.12/sjest-tests-test-fastopt.js"
-  //where to put generated *.test.js files:
-  override protected def testJsDir = s"$project/target/sjests/"
-}
+val myTestFramework: TestFramework = new TestFramework("anywhere.MyTestFramework")
+testFrameworks += myTestFramework
+testOptions += Tests.Argument(myTestFramework, s"-opt.js.path:${(artifactPath in Test in fastOptJS).value}")
 ```
 
 Add test framework to sbt:
@@ -105,6 +100,11 @@ _You can pass `jest` configs directly from console:_
 See more configs in [JestFramework](src/main/scala/sjest/JestFramework.scala)
 ```scala
 abstract class JestFramework {
+  /** *opt.js full path or path relative to sbt root dir. This is prior to args */
+  protected def optJsPath: String
+  /** Generated *.test.js full path or path relative to sbt root dir. */
+  protected def testJsDir: String = "./target/scala-jests/"
+
   /** Yield test command, given a test.js file path. Jest configs can be put here. */
   protected def nodejsCmd(jsTestPath: String): NodejsCmd = (jsTestPath: String) =>
      NodejsCmd("node_modules/jest/bin/jest.js", js.Array("--colors", "--bail", jsTestPath))
@@ -113,7 +113,7 @@ abstract class JestFramework {
    * 'jest xx.test.js' is executed for every test, thus worse performance.
    * One could disable it by set this to false, and manually run jest from command line.
    */
-  protected def autoRunTestInSbt: Boolean
+  protected def autoRunTestInSbt: Boolean = true
   
   /** Filter jest output in sbt console */
   protected def jestOutputFilter: String => String
@@ -151,6 +151,8 @@ abstract class JestFramework {
 The result returned from `beforeGlobal` will be passed as a _stub_ to `afterGlobal`.
  
 ### About
+
+Jest facade is from [scalajs-jest](https://github.com/scalajs-jest/core)
  
 Author: Cause Chung (cuzfrog@139.com)
  

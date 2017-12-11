@@ -33,6 +33,7 @@ val root = (project in file("."))
     testFrameworks += new TestFramework("sjest.MyUTestFramework")
   )
 
+val myTestFramework: TestFramework = new TestFramework("anywhere.MyTestFramework")
 val tests = project.dependsOn(root)
   .enablePlugins(ScalaJSPlugin)
   .settings(commonSettings)
@@ -41,8 +42,9 @@ val tests = project.dependsOn(root)
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.4"
     ),
-    testFrameworks += new TestFramework("anywhere.MyTestFramework"),
-    testOptions += Tests.Argument()
+    testFrameworks += myTestFramework,
+    testOptions += Tests.Argument(myTestFramework,
+      s"-opt.js.path:${(artifactPath in Test in fastOptJS).value}")
   )
 
 //mount tmpfs:

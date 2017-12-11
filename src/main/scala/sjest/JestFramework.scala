@@ -40,8 +40,8 @@ abstract class JestFramework extends sbt.testing.Framework {
   //------------------ client custom api -------------------
   import JestFramework.defaultConfig
 
-  /** *opt.js full path or path relative to sbt root dir. */
-  protected def optJsPath: String
+  /** *opt.js full path or path relative to sbt root dir. This is prior to args */
+  protected def optJsPath: String = defaultConfig.optJsPath
 
   /** Generated *.test.js full path or path relative to sbt root dir. */
   protected def testJsDir: String = defaultConfig.testJsDir

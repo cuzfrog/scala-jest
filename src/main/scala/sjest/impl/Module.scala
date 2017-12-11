@@ -27,7 +27,9 @@ private[sjest] object Module {
               communicationTunnel: Option[String => Unit] = None)
              (implicit config: TestFrameworkConfig): this.type = {
     val globalStub = globalStubOpt.getOrElse(GlobalStub.dummyGlobalStub)
-    val newModule = new ImplementationModule(args, remoteArgs, globalStub, communicationTunnel)
+    val newModule = new ImplementationModule(
+      args.filter(_.startsWith(OPT_JS_PATH_KEY).unary_!), remoteArgs,
+      globalStub, communicationTunnel)(updateOptJsPath(args, config))
     if (!moduleRef.compareAndSet(null, newModule))
       throw new IllegalStateException("DI module can only be initiated once.")
     this
@@ -37,8 +39,22 @@ private[sjest] object Module {
 
   def defaultJestOutputFilter: String => String = JestOutputFilter.instance
 
-  /** Send message to master. */
-  def send(msg:String):Unit = getModule.communicationTunnel.foreach(_.apply(msg))
+  // ---- helpers ----
+  @VisibleForTest
+  private[impl] def updateOptJsPath(args: Array[String],
+                                    config: TestFrameworkConfig): TestFrameworkConfig = {
+    val pathOpt = args.find(_.startsWith(OPT_JS_PATH_KEY)).map { pathArg =>
+      pathArg.drop(OPT_JS_PATH_KEY.length).trim
+    }
+    pathOpt match {
+      case Some(p) =>
+        if (config.optJsPath.nonEmpty) config
+        else config.copy(optJsPath = p)
+      case None => config
+    }
+  }
+  @VisibleForTest
+  private[impl] final val OPT_JS_PATH_KEY = "-opt.js.path:"
 }
 
 private class ImplementationModule[S](args: Array[String],

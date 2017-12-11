@@ -10,13 +10,13 @@ trait PropertyTest extends sjest.BaseSuite {
   self: TestSuite =>
 
   protected def propertyTestRepeatTime: Int = 100
-  protected def propertyTestPathFilter: Seq[String] = Seq.empty
+  protected def propertyTestPathExcluded: Seq[String] = Seq.empty
 
   //properties based test
   override final def utestWrap(path: Seq[String],
                          runBody: => Future[Any])
                         (implicit ec: ExecutionContext): Future[Any] = {
-    if (path.intersect(propertyTestPathFilter).nonEmpty) runBody
+    if (path.intersect(propertyTestPathExcluded).nonEmpty) runBody
     else {
       require(propertyTestRepeatTime > 0, "repetition must be at least 1 time.")
       val repetition: Seq[Future[Any]] =
@@ -35,7 +35,7 @@ trait PropertyTest extends sjest.BaseSuite {
   /** Check if path filters are not matched with test paths. */
   private def checkPathsInPathFilter(): Unit = {
     val paths = extractPaths(this.tests.nameTree)
-    this.propertyTestPathFilter.foreach { p =>
+    this.propertyTestPathExcluded.foreach { p =>
       if (!paths.contains(p))
         throw new IllegalArgumentException(s"Cannot find filter '$p' in test path.")
     }

@@ -133,7 +133,7 @@ object JsTestContainerTest extends sjest.BaseSuite with PropertyTest {
     }
   }
 
-  override protected def propertyTestPathFilter: Seq[String] = Seq(
+  override protected def propertyTestPathExcluded: Seq[String] = Seq(
     "constraint-behavior", "negative-duplicate-names", "nested-describe-query",
     "bad-nested-describe"
   )

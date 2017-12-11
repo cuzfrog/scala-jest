@@ -7,7 +7,7 @@ import scala.util.Random
 
 object TestCaseResultTest extends sjest.BaseSuite with PropertyTest {
 
-  override protected def propertyTestPathFilter: Seq[String] = Seq("fromJsonNegative")
+  override protected def propertyTestPathExcluded: Seq[String] = Seq("fromJsonNegative")
 
   val tests = Tests {
     'serialization - {
