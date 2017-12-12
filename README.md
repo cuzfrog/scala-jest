@@ -19,7 +19,7 @@ Prerequisites:
 
 * `nodejs` (probably higher than v8.7.0) 
 * `package.json`, or `npm init` to make one
-* `npm install --save-dev jest`
+* `npm install --save-dev jest-cli`
 
 _See scala.js doc for file path conventions._
 

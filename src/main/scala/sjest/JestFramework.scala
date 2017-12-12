@@ -73,7 +73,7 @@ object JestFramework {
     optJsPath = "",
     testJsDir = "./target/scala-jests/",
     nodejsCmdOfPath = (jsTestPath: String) =>
-      NodejsCmd("node_modules/jest/bin/jest.js", js.Array("--colors", jsTestPath)),
+      NodejsCmd("node_modules/jest-cli/bin/jest.js", js.Array("--colors", jsTestPath)),
     autoRunTestInSbt = true,
     jestOutputFilter = Module.defaultJestOutputFilter
   )
