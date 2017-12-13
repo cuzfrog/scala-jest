@@ -2,7 +2,7 @@ import sbt.Keys._
 import sbt._
 import MyTasks._
 import com.github.cuzfrog.sbttmpfs.SbtTmpfsPlugin.autoImport._
-import org.scalajs.sbtplugin.ScalaJSPlugin.AutoImport._
+import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import com.typesafe.sbt.pgp.PgpKeys._
 
 object Settings {
@@ -23,7 +23,7 @@ object Settings {
     parallelExecution in Test := false,
     licenses += ("Apache-2.0", url("https://opensource.org/licenses/Apache-2.0")),
     tmpfsDirectoryMode := TmpfsDirectoryMode.Mount,
-    scalaJSModuleKind := ModuleKind.CommonJSModule
+    scalaJSLinkerConfig ~= {_.withModuleKind(ModuleKind.CommonJSModule)}
   )
 
   val publicationSettings = Seq(
