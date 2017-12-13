@@ -11,6 +11,9 @@ Build against scala-2.12 and scalajs-0.6.21.
 * To provide a better test ability against nodejs + jsdom + CommonJS on scala.js.
 * That is: test your scala.js-react project just by `sbt test`
 
+(You can use [nodejs js-environment](https://github.com/scala-js/scala-js-env-jsdom-nodejs)
+ other than default in scalajs to achieve the same goal)
+
 ![scala-jest-demo.png](demo-pic/scala-jest-demo.png)
 
 ### Setup
@@ -25,7 +28,7 @@ _See scala.js doc for file path conventions._
 
 Dependency:
 
-    libraryDependencies += "com.github.cuzfrog" %%% "sjest" % "0.1.0-SNAPSHOT" % Test
+    libraryDependencies += "com.github.cuzfrog" %%% "sjest" % "0.1.0" % Test
 
 Provide test Framework(to specify client build info):
 ```scala
