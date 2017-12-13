@@ -153,6 +153,18 @@ class JestFramework {
 ```
 The result returned from `beforeGlobal` will be passed as a _stub_ to `afterGlobal`.
  
+#### Limitations
+
+1. Dom not exists until run in jest,
+ that means access of `dom` outside `test` block will get `NullPointerException`.
+ Use `def` or `lazy val` to overcome this problem:
+```scala
+object MyTest extends sjest.JestSuite{
+  lazy val div = dom.document.createElement("div")
+  test("dom test"){...access div here}
+}
+```
+
 ### About
 
 Jest facade is from [scalajs-jest](https://github.com/scalajs-jest/core)
