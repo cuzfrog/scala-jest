@@ -44,15 +44,14 @@ private class NodejsTestImpl(consoleArgs: Args,
   private def resolveChildProcess(childProcess: ChildProcessOpt,
                                   loggers: Array[Logger])
                                  (implicit taskDef: TaskDef, config: TestFrameworkConfig): JestTestEvent = {
-    val (status, outputOpt) = childProcess.status match {
+    val outputOpt = childProcess.outputOpt
+    val status = childProcess.status match {
       case 0 =>
-        val output = childProcess.outputOpt
-        output.map(config.jestOutputFilter).foreach(loggers.info)
-        (Status.Success, output)
+        outputOpt.map(config.jestOutputFilter).foreach(loggers.info)
+        Status.Success
       case _ =>
-        val output = childProcess.stderrOpt
-        output.map(config.jestOutputFilter).foreach(loggers.error)
-        (Status.Failure, output)
+        outputOpt.map(config.jestOutputFilter).foreach(loggers.error)
+        Status.Failure
     }
     outputOpt.foreach(this.countTestResult(_, status))
     testStatistics.nextTestSuite()
