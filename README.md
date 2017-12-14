@@ -1,6 +1,7 @@
 # Scala-jest
+[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.17.svg)](https://www.scala-js.org)
 [![Build Status](https://travis-ci.org/cuzfrog/scala-jest.svg?branch=master)](https://travis-ci.org/cuzfrog/scala-jest)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.cuzfrog/sjest/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.cuzfrog/sjest)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.cuzfrog/sjest_sjs0.6_2.12/badge.svg)](https://search.maven.org/#search%7Cga%7C1%7Csjest)
 
 Write `jest` tests as scala classes and run them within sbt without any hassle.
 
