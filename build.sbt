@@ -64,6 +64,6 @@ pgpPassphrase := sys.env.get("PGP_PASS").map(_.toArray)
 releaseProcess := Seq[ReleaseStep](
   checkSnapshotDependencies,
   releaseStepCommand("pgp-cmd recv-key 895B79DB hkp://keyserver.ubuntu.com"),
-  releaseStepCommand("+publishSigned"),
-  releaseStepCommand("sonatypeReleaseAll")
+  releaseStepCommand("publishSigned"),
+  releaseStepCommand("sonatypeRelease")
 )
