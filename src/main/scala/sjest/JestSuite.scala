@@ -8,6 +8,7 @@ import scala.concurrent.Future
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.scalajs.js
 import scala.scalajs.js.JSConverters._
+import scala.scalajs.js.annotation.JSName
 import scala.scalajs.reflect.annotation.EnableReflectiveInstantiation
 
 @EnableReflectiveInstantiation
@@ -51,6 +52,9 @@ abstract class JestSuite {
 
   @noinline
   protected final def expect[T](value: T): Matcher[T] = JestGlobal.expect(value)
+
+  @noinline
+  protected final def expectFunc(func: js.Function): Matcher[js.Function] = JestGlobal.expect(func)
 
   @noinline
   protected final def expectAsync[T](value: Future[T]): MatcherAsync[T] =
