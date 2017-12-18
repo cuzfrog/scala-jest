@@ -26,7 +26,9 @@ private final class JsTestGeneratorImpl(implicit config: TestFrameworkConfig)
          |const loadTest = out.loadTest;
          |const loadControl = out.loadControl;""".stripMargin
 
-    val content = module + NEWLINE(2) + jsTestContainer.testContent
+    val content =
+      config.sourceMapSupport + NEWLINE +
+        module + NEWLINE(2) + jsTestContainer.testContent
 
     val testJsPath = this.resolveTestJsPath(jsTestContainer)
     FSUtils.write(testJsPath, content)

@@ -6,7 +6,7 @@ import scala.scalajs.js.|
 
 @JSGlobalScope
 @js.native
-private object JestGlobal extends js.Object {
+private[sjest] object JestGlobal extends js.Object {
 
   def test(str: String, function: js.Function0[Any]): Unit = js.native
 

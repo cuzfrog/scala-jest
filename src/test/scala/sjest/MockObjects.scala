@@ -28,7 +28,7 @@ private object MockSuccessTest extends JestSuite {
   }
 
 
-  val suiteName =
+  val suiteName: String =
     if(getClass.getName.endsWith("$")) getClass.getName.dropRight(1) else getClass.getName
   this.container.setSuiteName(suiteName)
 }

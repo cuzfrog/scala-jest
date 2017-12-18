@@ -18,6 +18,6 @@ private final class MyTestFramework extends JestFramework {
       val expectedValues = Seq(0, 1, 2)
       assert(globalMarker.values == expectedValues)
     }
-    println(s"global marker after global, sig-${globalMarker.signature}, values:${globalMarker.values}")
+    //println(s"global marker after global, sig-${globalMarker.signature}, values:${globalMarker.values}")
   }
 }

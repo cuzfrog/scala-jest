@@ -32,6 +32,7 @@ class JestFramework extends sbt.testing.Framework {
       this.testJsDir,
       this.nodejsCmd,
       this.autoRunTestInSbt,
+      this.sourceMapSupport,
       this.jestOutputFilter
     )
   }
@@ -55,6 +56,9 @@ class JestFramework extends sbt.testing.Framework {
    */
   protected def autoRunTestInSbt: Boolean = defaultConfig.autoRunTestInSbt
 
+  /** Source map support in stack trace. */
+  protected def sourceMapSupport: String = defaultConfig.sourceMapSupport
+
   /** Filter jest output in sbt console */
   protected def jestOutputFilter: String => String = defaultConfig.jestOutputFilter
 
@@ -75,6 +79,7 @@ object JestFramework {
     nodejsCmdOfPath = (jsTestPath: String) =>
       NodejsCmd("node_modules/jest-cli/bin/jest.js", js.Array("--colors", jsTestPath)),
     autoRunTestInSbt = true,
+    sourceMapSupport = "require('source-map-support').install();",
     jestOutputFilter = Module.defaultJestOutputFilter
   )
 }
@@ -83,9 +88,10 @@ private final case class TestFrameworkConfig(optJsPath: String,
                                              testJsDir: String,
                                              nodejsCmdOfPath: String => JestFramework.NodejsCmd,
                                              autoRunTestInSbt: Boolean,
+                                             sourceMapSupport: String,
                                              jestOutputFilter: String => String)
 
 private final case class GlobalStub[S](setupResult: S, globalTeardown: S => Unit)
-private object GlobalStub{
+private object GlobalStub {
   val dummyGlobalStub: GlobalStub[Unit] = GlobalStub[Unit]((), _ => ())
 }

@@ -42,7 +42,8 @@ object JsTestGeneratorTest extends sjest.BaseSuite with PropertyTest {
       val content = Fs.readFileSync(path).toString()
       val relativeOptJsPath = Path.relative(mockConfig.testJsDir, mockConfig.optJsPath)
       val expectedContent =
-        s"""const out = require('$relativeOptJsPath');
+        s"""require('source-map-support').install();
+           |const out = require('$relativeOptJsPath');
            |const loadTest = out.loadTest;
            |const loadControl = out.loadControl;
            |
@@ -52,7 +53,7 @@ object JsTestGeneratorTest extends sjest.BaseSuite with PropertyTest {
            |test('$testName2', () => {
            |  loadTest('${mockTestCase.getSuiteName}',['$testName2'])();
            |});""".stripMargin
-      assert(content.contains(expectedContent))
+      assert(content == expectedContent)
     }
   }
 }

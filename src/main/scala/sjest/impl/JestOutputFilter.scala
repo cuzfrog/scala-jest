@@ -30,7 +30,8 @@ private final class JestOutputFilterDefaultImpl extends JestOutputFilter {
         !line.startsWith("Tests:") &&
         !line.startsWith("Test Suites:") &&
         !line.startsWith("Snapshots:") &&
-        !line.startsWith("""Time:""") =>
+        !line.startsWith("""Time:""") &&
+        !(line.trim.startsWith("at") && line.contains("scala/scala/scalajs/runtime/AnonFunctions.scala")) =>
       original
     }
     filtered.mkString(NEWLINE)
