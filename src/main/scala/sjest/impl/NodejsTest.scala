@@ -54,7 +54,7 @@ private class NodejsTestImpl(consoleArgs: Args,
         Status.Failure
     }
     outputOpt.foreach(this.countTestResult(_, status))
-    testStatistics.nextTestSuite()
+    testStatistics.nextTestSuite(status)
     JestTestEvent(status)
   }
 

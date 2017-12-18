@@ -1,5 +1,6 @@
 package sjest.impl
 
+import sbt.testing.Status
 import sjest.support.{Service, Stateful}
 
 import scala.collection.mutable.ArrayBuffer
@@ -11,7 +12,7 @@ private sealed trait TestStatistics {
   def incrementPassedTest(n: Int = 1): Unit
   @throws[IllegalArgumentException]
   def incrementFailedTest(n: Int = 1): Unit
-  def nextTestSuite(): Unit
+  def nextTestSuite(status: Status): Unit
 
   def totalTestCnt: Int
   def passedTestCnt: Int
@@ -51,9 +52,10 @@ private final class TestStatisticsImpl extends TestStatistics {
     checkIfDeposited()
     failureCount += n
   }
-  override def nextTestSuite(): Unit = {
+  override def nextTestSuite(status: Status): Unit = {
     checkIfDeposited()
-    suites += TestCaseResult(failureCount, successCount)
+    val isSuccessful = status == Status.Success
+    suites += TestCaseResult(failureCount, successCount, isSuccessful)
     successCount = 0
     failureCount = 0
   }
@@ -76,15 +78,16 @@ private final class TestStatisticsImpl extends TestStatistics {
   }
   override lazy val passedSuiteCnt: Int = {
     deposit()
-    suites.count(_.failed == 0)
+    suites.count(t => t.failed == 0 && t.isSuccessfulSuite)
   }
   override lazy val failedSuiteCnt: Int = {
     deposit()
-    suites.count(_.failed > 0)
+    suites.count(t => t.failed > 0 || !t.isSuccessfulSuite)
   }
 
   private def deposit(): Unit = {
-    if (successCount + failureCount > 0) nextTestSuite()
+    val status = if (failureCount > 0) Status.Failure else Status.Success
+    if (successCount + failureCount > 0) nextTestSuite(status)
     deposited = true
   }
   private def checkIfDeposited(): Unit = {
@@ -93,14 +96,14 @@ private final class TestStatisticsImpl extends TestStatistics {
 
   override def testsReport(ansi: Boolean): String = {
     val total = totalTestCnt + " total"
-    val success = if (passedTestCnt > 0) green(ansi)(passedTestCnt + " passed, ") else ""
-    val failure = if (failedTestCnt > 0) red(ansi)(failedTestCnt + " failed, ") else ""
+    val success = if (passedTestCnt > 0) green(ansi)(passedTestCnt + " passed") + ", " else ""
+    val failure = if (failedTestCnt > 0) red(ansi)(failedTestCnt + " failed") + ", " else ""
     s"Test       : $failure$success$total"
   }
   override def suitesReport(ansi: Boolean): String = {
     val total = totalSuiteCnt + " total"
-    val success = if (passedSuiteCnt > 0) green(ansi)(passedSuiteCnt + " passed, ") else ""
-    val failure = if (failedSuiteCnt > 0) red(ansi)(failedSuiteCnt + " failed, ") else ""
+    val success = if (passedSuiteCnt > 0) green(ansi)(passedSuiteCnt + " passed") + ", " else ""
+    val failure = if (failedSuiteCnt > 0) red(ansi)(failedSuiteCnt + " failed") + ", " else ""
     s"Test Suites: $failure$success$total"
   }
   private def red(ansi: Boolean)(in: String) = if (ansi) fansi.Color.Red(in) else in

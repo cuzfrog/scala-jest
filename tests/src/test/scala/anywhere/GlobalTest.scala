@@ -12,7 +12,7 @@ object GlobalTest1 extends sjest.JestSuite {
     GlobalMarker.mark(1)
   }
 
-  afterAll(GlobalMarker.show(this.getClass.getName))
+  //afterAll(GlobalMarker.show(this.getClass.getName))
 }
 
 object GlobalTest2 extends sjest.JestSuite {
@@ -24,7 +24,7 @@ object GlobalTest2 extends sjest.JestSuite {
     GlobalMarker.mark(1)
   }
 
-  afterAll(GlobalMarker.show(this.getClass.getName))
+  //afterAll(GlobalMarker.show(this.getClass.getName))
 }
 
 object GlobalMarker {
@@ -36,7 +36,7 @@ object GlobalMarker {
 
 private class GlobalMarker {
   val signature: Int = Random.nextInt(9999999)
-  println(s"GlobalMarker created, sig-$signature")
+  //println(s"GlobalMarker created, sig-$signature")
   var assertMarker: Boolean = false
   var values: mutable.ArrayBuffer[Int] = mutable.ArrayBuffer.empty
 

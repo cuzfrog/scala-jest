@@ -26,7 +26,7 @@ _See scala.js doc for file path conventions._
 
 Dependency:
 
-    libraryDependencies += "com.github.cuzfrog" %%% "sjest" % "0.1.1" % Test
+    libraryDependencies += "com.github.cuzfrog" %%% "sjest" % "0.1.2-SNAPSHOT" % Test
 
 Provide test Framework(to specify client build info):
 ```scala

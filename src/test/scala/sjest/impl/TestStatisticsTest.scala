@@ -1,5 +1,6 @@
 package sjest.impl
 
+import sbt.testing.Status
 import sjest.PropertyTest
 import utest._
 
@@ -14,7 +15,7 @@ object TestStatisticsTest extends sjest.BaseSuite with PropertyTest {
       val suites = (1 to suiteCnt).map { _ =>
         val suite = new MockTestSuiteCnt
         suite.test(impl)
-        impl.nextTestSuite()
+        impl.nextTestSuite(Status.Success)
         suite
       }
 
@@ -64,6 +65,13 @@ object TestStatisticsTest extends sjest.BaseSuite with PropertyTest {
       val resultSuites = impl.addSuites(mockSuites).getSuites
       assert(resultSuites == mockSuites)
     }
+    "failedSuite" -{
+      impl.nextTestSuite(Status.Failure)
+      assert(impl.failedSuiteCnt == 1)
+      val report = impl.suitesReport(false)
+      val expectedReport = "Test Suites: 1 failed, 1 total"
+      assert(report == expectedReport)
+    }
   }
 
   private def passedStr(n: Int): String = if (n > 0) s"$n passed" else ""
@@ -81,5 +89,9 @@ object TestStatisticsTest extends sjest.BaseSuite with PropertyTest {
 
     def isFailed: Boolean = failedTestCnt > 0
   }
+
+  override protected def propertyTestPathExcluded = Seq(
+    "failedSuite"
+  )
 }
 
