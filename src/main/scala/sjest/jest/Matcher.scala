@@ -7,7 +7,7 @@ import scala.scalajs.js.|
 trait Matcher[T] extends js.Object {
 
   def toBe(in: T): js.Object = js.native
-  def toBeCloseTo(in: T): js.Object = js.native
+  def toBeCloseTo(number: Double, numDigits: Int): js.Object = js.native
   def toBeDefined(): js.Object = js.native
   def toBeFalsy(): js.Object = js.native
   def toBeGreaterThan(numb: Double): js.Object = js.native
