@@ -4,7 +4,7 @@ inThisBuild(Seq(
   shellPrompt := { state => Project.extract(state).currentRef.project + "> " },
   scalaVersion := "2.12.4",
   crossScalaVersions := Seq("2.12.4"), //"2.11.11" is not compatible with macwire
-  version := "0.1.2"
+  version := "0.1.3-SNAPSHOT"
 ))
 
 //val macros = project

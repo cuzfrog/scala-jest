@@ -26,7 +26,7 @@ _See scala.js doc for file path conventions._
 
 Dependency:
 
-    libraryDependencies += "com.github.cuzfrog" %%% "sjest" % "0.1.2-SNAPSHOT" % Test
+    libraryDependencies += "com.github.cuzfrog" %%% "sjest" % "0.1.3-SNAPSHOT" % Test
 
 Provide test Framework(to specify client build info):
 ```scala
@@ -115,6 +115,9 @@ class JestFramework {
    * One could disable it by set this to false, and manually run jest from command line.
    */
   protected def autoRunTestInSbt: Boolean = true
+  
+  /** Whether to suppress console output when test suite passes. */
+  protected def silentOnPass: Boolean = false
   
   /** Filter jest output in sbt console */
   protected def jestOutputFilter: String => String = defaultFilter

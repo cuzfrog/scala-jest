@@ -6,7 +6,10 @@ import sjest.nodejs.FSUtils
 import sjest.{AddTestUtilities, MockObjects, TestFrameworkConfig}
 import utest._
 
+import scala.concurrent.Future
 import scala.util.Random
+
+import scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 object NodejsTestImplTest extends sjest.BaseSuite {
 
@@ -14,19 +17,32 @@ object NodejsTestImplTest extends sjest.BaseSuite {
   private implicit val taskDef: TaskDef = MockObjects.newTaskDef("test-taskDef")
   private val module = ModuleForTest()
 
-  override def utestAfterAll(): Unit = FSUtils.delete(mockConfig.testJsDir)
+  //override def utestAfterAll(): Unit = FSUtils.delete(mockConfig.testJsDir)
 
   val tests = Tests {
     val logger = new TestLogger
     'unit - {
       val impl: NodejsTestImpl = module.Prototype.nodejsTestImpl
-      "successful-test" - {
+      "successful-test" - Future{
         val mockJsTestFile = new MockJsTestFile
         val event = impl.runTest(mockJsTestFile.testPath, Array(logger))
         if (event.status() != Status.Success) logger.flush()
         assert(event.status() == Status.Success)
+
+        val printMsg = logger.getAndEmptyContent.find(_.contains(mockJsTestFile.printMessageOnPass))
+        if (mockJsTestFile.config.silentOnPass) assert(printMsg.isEmpty)
+        else assert(printMsg.isDefined)
       }
-      "failed-throw-test" - {
+      "silentOnPass-false" - Future{
+        val mockJsTestFile = new MockJsTestFile
+        val module = ModuleForTest()(mockConfig.copy(silentOnPass = false))
+        val impl = module.Prototype.nodejsTestImpl
+        impl.runTest(mockJsTestFile.testPath, Array(logger))
+        val output = logger.getAndEmptyContent
+        val printMsg = output.find(_.contains(mockJsTestFile.printMessageOnPass))
+        assert(printMsg.isDefined)
+      }
+      "failed-throw-test" - Future{
         val mockJsTestFile = new MockJsTestFileFailedThrow
         val event = impl.runTest(mockJsTestFile.testPath, Array(logger))
         assert(event.status() == Status.Failure)
@@ -58,7 +74,7 @@ object NodejsTestImplTest extends sjest.BaseSuite {
 }
 
 private class MockJsTestFile(val failed: Int = 0, val passed: Int = 1)
-                            (implicit config: TestFrameworkConfig) extends AddTestUtilities{
+                            (implicit val config: TestFrameworkConfig) extends AddTestUtilities {
   require(failed + passed > 0 && failed >= 0 && passed >= 0)
   val testName: String = "mock-test-" + Random.genAlphanumeric(10)
   val testDescription: String = Random.genAlphanumeric(20)
@@ -71,6 +87,8 @@ private class MockJsTestFile(val failed: Int = 0, val passed: Int = 1)
     FSUtils.write(Path.resolve(config.testJsDir, testName + ".test.js"), jsTestContent)
   }
 
+  lazy val printMessageOnPass: String = Random.genAlphanumeric(20)
+
   def genFailed: Seq[String] = (1 to failed).map { idx =>
     s"""test('$testDescription-failed-$idx', () => {
        |  expect(1 + 2).toBe(0);
@@ -80,6 +98,7 @@ private class MockJsTestFile(val failed: Int = 0, val passed: Int = 1)
   def genPassed: Seq[String] = (1 to passed).map { idx =>
     s"""test('$testDescription-passed-$idx', () => {
        |  expect(1 + 2).toBe(3);
+       |  console.log('$printMessageOnPass')
        |});
        |""".stripMargin
   }

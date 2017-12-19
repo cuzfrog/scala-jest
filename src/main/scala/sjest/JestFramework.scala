@@ -32,6 +32,7 @@ class JestFramework extends sbt.testing.Framework {
       this.testJsDir,
       this.nodejsCmd,
       this.autoRunTestInSbt,
+      this.silentOnPass,
       this.sourceMapSupport,
       this.jestOutputFilter
     )
@@ -56,6 +57,9 @@ class JestFramework extends sbt.testing.Framework {
    */
   protected def autoRunTestInSbt: Boolean = defaultConfig.autoRunTestInSbt
 
+  /** Whether to suppress console output when test suite passes. */
+  protected def silentOnPass: Boolean = defaultConfig.silentOnPass
+
   /** Source map support in stack trace. */
   protected def sourceMapSupport: String = defaultConfig.sourceMapSupport
 
@@ -79,6 +83,7 @@ object JestFramework {
     nodejsCmdOfPath = (jsTestPath: String) =>
       NodejsCmd("node_modules/jest-cli/bin/jest.js", js.Array("--colors", jsTestPath)),
     autoRunTestInSbt = true,
+    silentOnPass = false,
     sourceMapSupport = "require('source-map-support').install();",
     jestOutputFilter = Module.defaultJestOutputFilter
   )
@@ -88,6 +93,7 @@ private final case class TestFrameworkConfig(optJsPath: String,
                                              testJsDir: String,
                                              nodejsCmdOfPath: String => JestFramework.NodejsCmd,
                                              autoRunTestInSbt: Boolean,
+                                             silentOnPass: Boolean,
                                              sourceMapSupport: String,
                                              jestOutputFilter: String => String)
 
