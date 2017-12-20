@@ -4,7 +4,7 @@ inThisBuild(Seq(
   shellPrompt := { state => Project.extract(state).currentRef.project + "> " },
   scalaVersion := "2.12.4",
   crossScalaVersions := Seq("2.12.4"), //"2.11.11" is not compatible with macwire
-  version := "0.1.3-SNAPSHOT"
+  version := "0.2.0-SNAPSHOT"
 ))
 
 //val macros = project
@@ -28,7 +28,9 @@ val root = (project in file("."))
       "io.scalajs" %%% "nodejs" % "0.4.2",
       "com.lihaoyi" %%% "fansi" % "0.2.5",
       "com.beachape" %%% "enumeratum" % "1.5.12",
-      "com.lihaoyi" %%% "utest" % "0.6.0" % Test
+      "com.lihaoyi" %%% "utest" % "0.6.0" % Test,
+      "com.github.julien-truffaut" %%% "monocle-core" % "1.4.0" % Test,
+      "com.github.julien-truffaut" %%% "monocle-macro" % "1.4.0" % Test,
     ),
     testFrameworks += new TestFramework("sjest.MyUTestFramework")
   )

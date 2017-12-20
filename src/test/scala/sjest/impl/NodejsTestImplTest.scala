@@ -1,15 +1,15 @@
 package sjest.impl
 
 import io.scalajs.nodejs.path.Path
+import monocle.macros.syntax.lens._
 import sbt.testing.{Status, TaskDef}
 import sjest.nodejs.FSUtils
 import sjest.{AddTestUtilities, MockObjects, TestFrameworkConfig}
 import utest._
 
 import scala.concurrent.Future
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 import scala.util.Random
-
-import scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 object NodejsTestImplTest extends sjest.BaseSuite {
 
@@ -23,26 +23,26 @@ object NodejsTestImplTest extends sjest.BaseSuite {
     val logger = new TestLogger
     'unit - {
       val impl: NodejsTestImpl = module.Prototype.nodejsTestImpl
-      "successful-test" - Future{
+      "successful-test" - Future {
         val mockJsTestFile = new MockJsTestFile
         val event = impl.runTest(mockJsTestFile.testPath, Array(logger))
         if (event.status() != Status.Success) logger.flush()
         assert(event.status() == Status.Success)
 
         val printMsg = logger.getAndEmptyContent.find(_.contains(mockJsTestFile.printMessageOnPass))
-        if (mockJsTestFile.config.silentOnPass) assert(printMsg.isEmpty)
+        if (mockJsTestFile.config.argsConfig.silentOnPass) assert(printMsg.isEmpty)
         else assert(printMsg.isDefined)
       }
-      "silentOnPass-false" - Future{
+      "silentOnPass-false" - Future {
         val mockJsTestFile = new MockJsTestFile
-        val module = ModuleForTest()(mockConfig.copy(silentOnPass = false))
+        val module = ModuleForTest()(mockConfig.lens(_.argsConfig.silentOnPass).set(false))
         val impl = module.Prototype.nodejsTestImpl
         impl.runTest(mockJsTestFile.testPath, Array(logger))
         val output = logger.getAndEmptyContent
         val printMsg = output.find(_.contains(mockJsTestFile.printMessageOnPass))
         assert(printMsg.isDefined)
       }
-      "failed-throw-test" - Future{
+      "failed-throw-test" - Future {
         val mockJsTestFile = new MockJsTestFileFailedThrow
         val event = impl.runTest(mockJsTestFile.testPath, Array(logger))
         assert(event.status() == Status.Failure)

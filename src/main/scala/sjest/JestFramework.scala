@@ -26,22 +26,21 @@ class JestFramework extends sbt.testing.Framework {
     //note: master and slave are in two different applications, thus two Modules
   }
 
+  import JestFramework.defaultConfig
+
   private implicit final def assembleConfig: TestFrameworkConfig = {
     TestFrameworkConfig(
       this.optJsPath,
       this.testJsDir,
       this.nodejsCmd,
-      this.autoRunTestInSbt,
-      this.silentOnPass,
       this.sourceMapSupport,
-      this.jestOutputFilter
+      this.jestOutputFilter,
+      defaultConfig.argsConfig
     )
   }
   private final def assembleGlobalStub = Some(GlobalStub(beforeGlobal(), afterGlobal))
 
   //------------------ client custom api -------------------
-  import JestFramework.defaultConfig
-
   /** *opt.js full path or path relative to sbt root dir. This is prior to args */
   protected def optJsPath: String = defaultConfig.optJsPath
 
@@ -50,15 +49,6 @@ class JestFramework extends sbt.testing.Framework {
 
   /** Yield test command, given a test.js file path.  Jest configs can be put here. */
   protected def nodejsCmd(jsTestPath: String): NodejsCmd = defaultConfig.nodejsCmdOfPath(jsTestPath)
-
-  /** Whether to run actual test by `'sbt test'`. <br>
-   * 'jest xx.test.js' is executed for every test, thus worse performance.
-   * One could disable it by set this to false, and manually run jest from command line.
-   */
-  protected def autoRunTestInSbt: Boolean = defaultConfig.autoRunTestInSbt
-
-  /** Whether to suppress console output when test suite passes. */
-  protected def silentOnPass: Boolean = defaultConfig.silentOnPass
 
   /** Source map support in stack trace. */
   protected def sourceMapSupport: String = defaultConfig.sourceMapSupport
@@ -82,20 +72,24 @@ object JestFramework {
     testJsDir = "./target/scala-jests/",
     nodejsCmdOfPath = (jsTestPath: String) =>
       NodejsCmd("node_modules/jest-cli/bin/jest.js", js.Array("--colors", jsTestPath)),
-    autoRunTestInSbt = true,
-    silentOnPass = false,
     sourceMapSupport = "require('source-map-support').install();",
-    jestOutputFilter = Module.defaultJestOutputFilter
+    jestOutputFilter = Module.defaultJestOutputFilter,
+    argsConfig = ArgsConfig(
+      autoRunTestInSbt = true,
+      silentOnPass = false
+    )
   )
 }
 
 private final case class TestFrameworkConfig(optJsPath: String,
                                              testJsDir: String,
                                              nodejsCmdOfPath: String => JestFramework.NodejsCmd,
-                                             autoRunTestInSbt: Boolean,
-                                             silentOnPass: Boolean,
                                              sourceMapSupport: String,
-                                             jestOutputFilter: String => String)
+                                             jestOutputFilter: String => String,
+                                             argsConfig: ArgsConfig)
+
+private case class ArgsConfig(autoRunTestInSbt: Boolean,
+                              silentOnPass: Boolean)
 
 private final case class GlobalStub[S](setupResult: S, globalTeardown: S => Unit)
 private object GlobalStub {

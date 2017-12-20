@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicReference
 import com.softwaremill.macwire._
 import sbt.testing.TaskDef
 import sjest.support.VisibleForTest
-import sjest.{GlobalStub, TestFrameworkConfig, impl}
+import sjest.{GlobalStub, TestFrameworkConfig}
 
 /**
  * One module per application.
@@ -27,9 +27,12 @@ private[sjest] object Module {
               communicationTunnel: Option[String => Unit] = None)
              (implicit config: TestFrameworkConfig): this.type = {
     val globalStub = globalStubOpt.getOrElse(GlobalStub.dummyGlobalStub)
+
+    val argsParser = ArgsParser(args ++ remoteArgs)
+
     val newModule = new ImplementationModule(
-      args.filter(_.startsWith(OPT_JS_PATH_KEY).unary_!), remoteArgs,
-      globalStub, communicationTunnel)(updateOptJsPath(args, config))
+      argsParser.filtered, globalStub, communicationTunnel)(argsParser.update(config))
+
     if (!moduleRef.compareAndSet(null, newModule))
       throw new IllegalStateException("DI module can only be initiated once.")
     this
@@ -38,27 +41,9 @@ private[sjest] object Module {
   def injectRunner: sbt.testing.Runner = getModule.jestRunner
 
   def defaultJestOutputFilter: String => String = JestOutputFilter.instance
-
-  // ---- helpers ----
-  @VisibleForTest
-  private[impl] def updateOptJsPath(args: Array[String],
-                                    config: TestFrameworkConfig): TestFrameworkConfig = {
-    val pathOpt = args.find(_.startsWith(OPT_JS_PATH_KEY)).map { pathArg =>
-      pathArg.drop(OPT_JS_PATH_KEY.length).trim
-    }
-    pathOpt match {
-      case Some(p) =>
-        if (config.optJsPath.nonEmpty) config
-        else config.copy(optJsPath = p)
-      case None => config
-    }
-  }
-  @VisibleForTest
-  private[impl] final val OPT_JS_PATH_KEY = "-opt.js.path:"
 }
 
 private class ImplementationModule[S](args: Array[String],
-                                      remoteArgs: Array[String],
                                       globalSetupStub: GlobalStub[S],
                                       val communicationTunnel: Option[String => Unit])
                                      (implicit config: TestFrameworkConfig) {
@@ -66,7 +51,6 @@ private class ImplementationModule[S](args: Array[String],
   final type CommunicationTunnel = String => Unit
 
   protected def jestRunnerArgs: JestRunner.Args = new JestRunner.Args(args)
-  protected def jestRunnerRemoteArgs: JestRunner.RemoteArgs = new impl.JestRunner.RemoteArgs(args)
   final def isSlave: Boolean = communicationTunnel.isDefined
 
   // ------ Singletons ------

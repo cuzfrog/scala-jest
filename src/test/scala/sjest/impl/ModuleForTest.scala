@@ -4,10 +4,9 @@ import com.softwaremill.macwire._
 import sjest.{GlobalStub, JestFramework, MockObjects, TestFrameworkConfig}
 
 private final
-case class ModuleForTest(args: Array[String] = Array.empty,
-                         remoteArgs: Array[String] = Array.empty)
+case class ModuleForTest(args: Array[String] = Array.empty)
                         (implicit config: TestFrameworkConfig = JestFramework.defaultConfig)
-  extends ImplementationModule(args, remoteArgs, GlobalStub.dummyGlobalStub, None)
+  extends ImplementationModule(args, GlobalStub.dummyGlobalStub, None)
     with Product with Serializable { module =>
 
   object Singleton {

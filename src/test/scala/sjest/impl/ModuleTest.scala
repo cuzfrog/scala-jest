@@ -8,7 +8,7 @@ import scala.util.Random
 /**
  * To test scope and relationship between dependencies.
  */
-object ModuleTest extends sjest.BaseSuite with PropertyTest {
+object ModuleTest extends sjest.BaseSuite{
 
   import sjest.MockObjects.mockConfig
 
@@ -24,19 +24,5 @@ object ModuleTest extends sjest.BaseSuite with PropertyTest {
       val testStatistics = module.testStatistics
       assert(testStatistics eq nodejsTest.testStatistics)
     }
-    val pathInArg = Random.genAlphanumeric(10) + "some.path.to.opt.js"
-    val args = Array(Module.OPT_JS_PATH_KEY + pathInArg, "noise" + Random.genAlphanumeric(5))
-    "updateOptJsPath-config-prior" - {
-      val config = Module.updateOptJsPath(args, mockConfig)
-      assert(config.optJsPath == mockConfig.optJsPath)
-    }
-    "updateOptJsPath" - {
-      val config = Module.updateOptJsPath(args, mockConfig.copy(optJsPath = ""))
-      assert(config.optJsPath == pathInArg)
-    }
   }
-
-  override protected def propertyTestPathExcluded = Seq(
-    "wrapper-state", "testStatistics-integration"
-  )
 }

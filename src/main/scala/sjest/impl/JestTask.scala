@@ -37,12 +37,12 @@ private class JestTask(override val taskDef: TaskDef,
     suite.setSuiteName(taskDef.fullyQualifiedName())
     val jsTestPath = jsTestGenerator.generateJsTest(suite.container)
 
-    val event = if (config.autoRunTestInSbt) {
+    val event = if (config.argsConfig.autoRunTestInSbt) {
       nodejsTest.runTest(jsTestPath, loggers)
     }
     else {
-      loggers.foreach(_.info("*.test.js files are generated," +
-        " manually run the tests because auto run has been disabled"))
+      loggers.debug(s"$jsTestPath have been generated," +
+        " manually run the tests (auto run has been disabled)")
       JestTestEvent(Status.Ignored)
     }
     event

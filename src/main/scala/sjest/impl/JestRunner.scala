@@ -8,12 +8,11 @@ import scala.scalajs.js
 import scala.scalajs.js.JSON
 
 private class JestRunner(_args: Args,
-                         _remoteArgs: RemoteArgs,
                          taskFactory: TaskDef => Task,
                          testStatistics: TestStatistics) extends sbt.testing.Runner {
 
   override val args: Array[String] = _args.args
-  override val remoteArgs: Array[String] = _remoteArgs.args
+  override val remoteArgs: Array[String] = Array.empty
 
   override def tasks(taskDefs: Array[TaskDef]): Array[Task] = taskDefs.map(taskFactory)
 
@@ -44,13 +43,12 @@ private class JestRunner(_args: Args,
 }
 
 private class JestSlaveRunner[S](_args: Args,
-                                 _remoteArgs: RemoteArgs,
                                  taskFactory: TaskDef => Task,
                                  testStatistics: TestStatistics,
                                  globalStub: GlobalStub[S],
                                  sendToMaster: String => Unit)
                                 (implicit config: TestFrameworkConfig)
-  extends JestRunner(_args, _remoteArgs, taskFactory, testStatistics) {
+  extends JestRunner(_args, taskFactory, testStatistics) {
 
   override def done(): String = {
     import scalajs.js.JSConverters._

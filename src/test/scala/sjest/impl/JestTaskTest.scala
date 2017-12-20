@@ -5,6 +5,7 @@ import io.scalajs.nodejs.path.Path
 import sbt.testing.Status
 import utest._
 import sjest.MockObjects
+import monocle.macros.syntax.lens._
 
 import scala.concurrent.Future
 
@@ -18,7 +19,7 @@ object JestTaskTest extends sjest.BaseSuite {
   val tests = Tests {
     val logger = new TestLogger
     "no-auto-run" - {
-      implicit val noRunConfig = config.copy(autoRunTestInSbt = false)
+      implicit val noRunConfig = config.lens(_.argsConfig.autoRunTestInSbt).set(false)
       val task = ModuleForTest().Prototype.jestTask(mockSuccessTestFqcn)
       val event = task.executeImpl(Array(logger))
 

@@ -26,7 +26,7 @@ _See scala.js doc for file path conventions._
 
 Dependency:
 
-    libraryDependencies += "com.github.cuzfrog" %%% "sjest" % "0.1.3-SNAPSHOT" % Test
+    libraryDependencies += "com.github.cuzfrog" %%% "sjest" % "0.2.0-SNAPSHOT" % Test
 
 Provide test Framework(to specify client build info):
 ```scala
@@ -98,7 +98,7 @@ _You can pass `jest` configs directly from console:_
 
 ### More config:
 
-See more configs in [JestFramework](src/main/scala/sjest/JestFramework.scala)
+Configs in [JestFramework](src/main/scala/sjest/JestFramework.scala)
 ```scala
 class JestFramework {
   /** *opt.js full path or path relative to sbt root dir. This is prior to args */
@@ -110,19 +110,23 @@ class JestFramework {
   protected def nodejsCmd(jsTestPath: String): NodejsCmd = (jsTestPath: String) =>
      NodejsCmd("node_modules/jest/bin/jest.js", js.Array("--colors", "--bail", jsTestPath))
   
-  /** Whether to run actual test by `'sbt test'`.
-   * 'jest xx.test.js' is executed for every test, thus worse performance.
-   * One could disable it by set this to false, and manually run jest from command line.
-   */
-  protected def autoRunTestInSbt: Boolean = true
-  
-  /** Whether to suppress console output when test suite passes. */
-  protected def silentOnPass: Boolean = false
-  
   /** Filter jest output in sbt console */
   protected def jestOutputFilter: String => String = defaultFilter
 }
 ```
+
+Arguments configs:
+
+* `-opt.js.path:<path>`: *opt.js full path or path relative to sbt root dir.
+This will be overridden if `optJsPath` in JestFramework has been specified.
+
+* `-disableAutoRunTestInSbt`(default true): Whether to run actual test by `'sbt test'`.
+'jest xx.test.js' is executed for every test, thus worse performance.
+One could disable it by set this to false, and manually run jest from command line.
+
+* `-silentOnPass` (default false): Whether to suppress console output when test suite passes.
+
+_these will be stripped from arguments before passed to jest_
 
 ### Global life cycle:
 

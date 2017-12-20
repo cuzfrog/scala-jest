@@ -47,7 +47,8 @@ private class NodejsTestImpl(consoleArgs: Args,
     val outputOpt = childProcess.outputOpt
     val status = childProcess.status match {
       case 0 =>
-        val outputForPass = if (config.silentOnPass) childProcess.stderrOpt else outputOpt
+        val outputForPass =
+          if (config.argsConfig.silentOnPass) childProcess.stderrOpt else outputOpt
         outputForPass.map(config.jestOutputFilter).foreach(loggers.info)
         Status.Success
       case _ =>
