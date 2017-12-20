@@ -9,7 +9,8 @@ import scala.scalajs.js.JSON
 
 private class JestRunner(_args: Args,
                          taskFactory: TaskDef => Task,
-                         testStatistics: TestStatistics) extends sbt.testing.Runner {
+                         testStatistics: TestStatistics,
+                         config: TestFrameworkConfig) extends sbt.testing.Runner {
 
   override val args: Array[String] = _args.args
   override val remoteArgs: Array[String] = Array.empty
@@ -17,7 +18,8 @@ private class JestRunner(_args: Args,
   override def tasks(taskDefs: Array[TaskDef]): Array[Task] = taskDefs.map(taskFactory)
 
   override def done(): String = {
-    testStatistics.report()
+    if (config.argsConfig.autoRunTestInSbt) testStatistics.report()
+    else s"*.test.js files have been generated (auto run has been disabled)"
   }
 
   override def receiveMessage(msg: String): Option[String] = {
@@ -48,7 +50,7 @@ private class JestSlaveRunner[S](_args: Args,
                                  globalStub: GlobalStub[S],
                                  sendToMaster: String => Unit)
                                 (implicit config: TestFrameworkConfig)
-  extends JestRunner(_args, taskFactory, testStatistics) {
+  extends JestRunner(_args, taskFactory, testStatistics, config) {
 
   override def done(): String = {
     import scalajs.js.JSConverters._
