@@ -5,7 +5,8 @@
 
 Write `jest` tests as scala classes and run them within sbt without any hassle.
 
-Build against scala-2.12 and scalajs-0.6.21.
+Build against scala-2.12 and scalajs-0.6.22.
+(scalajs-0.6.22 speeds up test startup)
 
 ### Motivation
 * To workaround scala.js issue [#2635](https://github.com/scala-js/scala-js/issues/2635).
@@ -26,7 +27,7 @@ _See scala.js doc for file path conventions._
 
 Dependency:
 
-    libraryDependencies += "com.github.cuzfrog" %%% "sjest" % "0.2.0-SNAPSHOT" % Test
+    libraryDependencies += "com.github.cuzfrog" %%% "sjest" % "0.2.0" % Test
 
 Provide test Framework(to specify client build info):
 ```scala
